@@ -1,4 +1,4 @@
-# Deployed Contracts Ropsten
+# Deployed Ropsten Contracts 
 
 Contract  	  					| Address
 --------------------------------| ------------------------------------------
@@ -36,7 +36,7 @@ https://ropsten.etherscan.io/address/0xBe565004a2F0C439EdcF68C0e743576149FD03F1#
 To mint, you'll need to enter the symbol of the token and the amount of tokens.
 (Remember that the tokens have different decimals)
 
-Currently minting is restricted to 500K
+Currently minting is restricted to a token value of $500K per person.
 
 ## Token Symbol List
 

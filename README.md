@@ -1,3 +1,18 @@
+# BAO Markets (a.k.a. HardSynths)
+
+A comprehensive documentation will be posted on our gitbook page soonTM.
+
+For those who want to dive into the protocol early we recommend familiarizing yourself with the compound protocol:
+
+https://compound.finance/docs (Excellent documentation)
+
+and after that Inverse Finance:
+
+https://github.com/InverseFinance/anchor
+
+**As of this moment** the only addition to the Inverse Finance protocol is the IMF calculation.
+Which you can skip for now, until the gitbook documentation is published.
+
 # Deployed Ropsten Contracts 
 
 Contract  	  					| Address

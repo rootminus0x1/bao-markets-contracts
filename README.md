@@ -20,7 +20,7 @@ Contract  	  					| Address									|Etherscan 																			|Code|
 Comptroller  					| 0x099452149D33E86374bEa74dB96d0a7B038BcA4D|https://ropsten.etherscan.io/address/0x099452149D33E86374bEa74dB96d0a7B038BcA4D	|https://github.com/baofinance/bao-markets-contracts/blob/master/contracts/Comptroller.sol|
 Unitroller  					| 0x8B932257a6b5D20EaD78FB4d5Fd00a19daF937b3|https://ropsten.etherscan.io/address/0x8B932257a6b5D20EaD78FB4d5Fd00a19daF937b3	|https://github.com/baofinance/bao-markets-contracts/blob/master/contracts/Unitroller.sol|
 Oracle  						| 0xf9941b9E8D010d961f7d3D6Aea57a108Bcfe1026|https://ropsten.etherscan.io/address/0xf9941b9E8D010d961f7d3D6Aea57a108Bcfe1026	|https://github.com/baofinance/bao-markets-contracts/blob/master/contracts/Oracle.sol|
-Stabilizer  					| 0xD15C57FE113C6276FAD2F82658BB420351147f5E|https://ropsten.etherscan.io/address/0xD15C57FE113C6276FAD2F82658BB420351147f5E	|https://github.com/baofinance/bao-markets-contracts/blob/master/contracts/Stabilizer.sol|
+Stabilizer  					| 0xf867C6C7C0eFAD233fA3bdD7eaC62C61F3FD00Cd|https://ropsten.etherscan.io/address/0xf867C6C7C0eFAD233fA3bdD7eaC62C61F3FD00Cd	|https://github.com/baofinance/bao-markets-contracts/blob/master/contracts/Stabilizer.sol|
 Fed  							| 0xcD4544dCa0fb0ad50F89F7cae23D8F4Da53784C5|https://ropsten.etherscan.io/address/0xcD4544dCa0fb0ad50F89F7cae23D8F4Da53784C5	|https://github.com/baofinance/bao-markets-contracts/blob/master/contracts/Fed.sol|
 bUSD ERC20						| 0xDF559301C178221E8D76E4A91126C504Dfe5947a|https://ropsten.etherscan.io/address/0xDF559301C178221E8D76E4A91126C504Dfe5947a	|https://github.com/baofinance/bao-markets-contracts/blob/master/contracts/ERC20.sol|
 bUSD interestrate model  		| 0xA50431c1C5aff4faD72ADcA6f473a729027332F9|https://ropsten.etherscan.io/address/0xA50431c1C5aff4faD72ADcA6f473a729027332F9	|https://github.com/baofinance/bao-markets-contracts/blob/master/contracts/JumpRateModelV2.sol|
@@ -42,7 +42,7 @@ EightDeciaml ERC20  			| 0x92Af1BCA5B2A1Ecbd835646D22cbc9b01Fb17600|https://rops
 TwelveDecimal bdToken  			| 0x30d5237C74520a99F957B3ad7435350C8D71d791|https://ropsten.etherscan.io/address/0x30d5237C74520a99F957B3ad7435350C8D71d791	|https://github.com/baofinance/bao-markets-contracts/blob/master/contracts/CErc20.sol|
 TwelveDecimal InterestRateModel | 0x1d5848842DeE52EFCA44E3b8Bcc4DEea1111596d|https://ropsten.etherscan.io/address/0x1d5848842DeE52EFCA44E3b8Bcc4DEea1111596d	|https://github.com/baofinance/bao-markets-contracts/blob/master/contracts/JumpRateModelV2.sol|
 TwelveDecimal ERC20  			| 0x44658B8C5996D341064F569cdc3f0BD172600a77|https://ropsten.etherscan.io/address/0x44658B8C5996D341064F569cdc3f0BD172600a77	|https://github.com/baofinance/bao-markets-contracts/blob/master/contracts/ERC20.sol|
-DAI ERC20 (Reserve)  			| 0xDc3c1D7741E454DEC2d2e6CFFe29605E4b7e01e3|https://ropsten.etherscan.io/address/0xDc3c1D7741E454DEC2d2e6CFFe29605E4b7e01e3	|https://github.com/baofinance/bao-markets-contracts/blob/master/contracts/ERC20.sol|
+DAI ERC20 (Reserve)  			| 0xf80A32A835F79D7787E8a8ee5721D0fEaFd78108|https://ropsten.etherscan.io/address/0xf80A32A835F79D7787E8a8ee5721D0fEaFd78108	|https://github.com/baofinance/bao-markets-contracts/blob/master/contracts/ERC20.sol|
 SushiPool (USDC/bUSD)			| 0x22b4dca09bcede9fb45fd9fc53c17daeed54c306| 										||	
 
 # Ropsten test tokens can be minted using the following contract:

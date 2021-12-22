@@ -107,24 +107,22 @@ contract Stabilizer {
     }
 
     function buy(uint amount) public {
-        require(supply.add(amount) <= supplyCap, "supply exceeded cap");
+        uint fee = amount.mul(buyFee).div(FEE_DENOMINATOR);
+        uint depositAmount = amount.sub(fee);
+        require(supply.add(depositAmount) <= supplyCap, "supply exceeded cap");
+        reserve.transferFrom(msg.sender, governance, fee);
+
         if(address(strat) != address(0)) {
-            reserve.transferFrom(msg.sender, address(strat), amount);
+            reserve.transferFrom(msg.sender, address(strat), depositAmount);
             strat.invest();
         } else {
-            reserve.transferFrom(msg.sender, address(this), amount);
+            reserve.transferFrom(msg.sender, address(this), depositAmount);
         }
+        
+        emit Buy(msg.sender, depositAmount, amount);
 
-        if(buyFee > 0) {
-            uint fee = amount.mul(buyFee).div(FEE_DENOMINATOR);
-            reserve.transferFrom(msg.sender, governance, fee);
-            emit Buy(msg.sender, amount, amount.add(fee));
-        } else {
-            emit Buy(msg.sender, amount, amount);
-        }
-
-        synth.mint(msg.sender, amount);
-        supply = supply.add(amount);
+        synth.mint(msg.sender, depositAmount);
+        supply = supply.add(depositAmount);
     }
 
     function sell(uint amount) public {

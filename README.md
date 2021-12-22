@@ -43,7 +43,7 @@ TwelveDecimal bdToken  			| 0x30d5237C74520a99F957B3ad7435350C8D71d791|https://r
 TwelveDecimal InterestRateModel | 0x1d5848842DeE52EFCA44E3b8Bcc4DEea1111596d|https://ropsten.etherscan.io/address/0x1d5848842DeE52EFCA44E3b8Bcc4DEea1111596d	|https://github.com/baofinance/bao-markets-contracts/blob/master/contracts/JumpRateModelV2.sol|
 TwelveDecimal ERC20  			| 0x44658B8C5996D341064F569cdc3f0BD172600a77|https://ropsten.etherscan.io/address/0x44658B8C5996D341064F569cdc3f0BD172600a77	|https://github.com/baofinance/bao-markets-contracts/blob/master/contracts/ERC20.sol|
 DAI ERC20 (Reserve)  			| 0xDc3c1D7741E454DEC2d2e6CFFe29605E4b7e01e3|https://ropsten.etherscan.io/address/0xDc3c1D7741E454DEC2d2e6CFFe29605E4b7e01e3	|https://github.com/baofinance/bao-markets-contracts/blob/master/contracts/ERC20.sol|
-SushiPool (USDC/bUSD)			| 0x22b4dca09bcede9fb45fd9fc53c17daeed54c306| 										||	
+SushiPool (USDC/bUSD)			| 0x22b4dca09bcede9fb45fd9fc53c17daeed54c306|https://ropsten.etherscan.io/address/0x22b4dca09bcede9fb45fd9fc53c17daeed54c306 										||	
 
 # Ropsten test tokens can be minted using the following contract:
 

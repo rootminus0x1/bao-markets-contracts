@@ -1,4 +1,5 @@
 require("@nomiclabs/hardhat-waffle");
+require("@nomiclabs/hardhat-etherscan");
 require("hardhat-gas-reporter");
 
 /**
@@ -18,9 +19,9 @@ require("hardhat-gas-reporter");
       //accounts: [""]
     },
     ropsten: {
-      url: "https://ropsten.infura.io/v3/",
+      url: "https://ropsten.infura.io/v3/3929f51780ec46d6903b10b02207c53b",
       //Consider any address posted here to be compromised
-      //accounts: ["",""]
+      accounts: ["26f79db75776e49903be1f2f5d44b0ce3167b865b3cfc02c6e7ee3973ce8dc64"]
     }
   },
   solidity: {
@@ -52,5 +53,8 @@ require("hardhat-gas-reporter");
     enabled: false,
     currency: 'USD',
     gasPriceApi: "https://api.etherscan.io/api?module=proxy&action=eth_gasPrice"
+  },
+  etherscan: {
+    apiKey: "254ZQHK97MWXHPZBN3Y76B1Y1T4HCMXUVS"
   }
 };

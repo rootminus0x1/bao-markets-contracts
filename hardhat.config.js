@@ -1,4 +1,5 @@
 require("@nomiclabs/hardhat-waffle");
+require("@nomiclabs/hardhat-etherscan");
 require("hardhat-gas-reporter");
 
 /**
@@ -20,7 +21,7 @@ require("hardhat-gas-reporter");
     ropsten: {
       url: "https://ropsten.infura.io/v3/",
       //Consider any address posted here to be compromised
-      //accounts: ["",""]
+      //accounts: [""]
     }
   },
   solidity: {
@@ -52,5 +53,8 @@ require("hardhat-gas-reporter");
     enabled: false,
     currency: 'USD',
     gasPriceApi: "https://api.etherscan.io/api?module=proxy&action=eth_gasPrice"
+  },
+  etherscan: {
+    apiKey: ""
   }
 };

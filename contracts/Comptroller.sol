@@ -1,5 +1,3 @@
-import "hardhat/console.sol";
-// File: Governance/IRock.sol
 
 pragma solidity ^0.5.16;
 
@@ -3043,6 +3041,12 @@ contract Comptroller is ComptrollerV5Storage, ComptrollerInterface, ComptrollerE
     /// @notice Emitted when COMP is granted by admin
     event CompGranted(address recipient, uint amount);
 
+    /// @notice Emitted when borrow restriction for a cToken is changed
+    event NewMarketRestriction(CToken indexed cToken, bool newRestriction);
+
+    /// @notice Emitted when a users whitelist status is changed
+    event NewWhitelistStatus(address indexed account, bool whitelisted);
+
     /// @notice The initial COMP index for a market
     uint224 public constant compInitialIndex = 1e36;
 
@@ -3054,6 +3058,16 @@ contract Comptroller is ComptrollerV5Storage, ComptrollerInterface, ComptrollerE
 
     // No collateralFactorMantissa may exceed this value
     uint internal constant collateralFactorMaxMantissa = 0.9e18; // 0.9
+
+    /**
+     * @notice Mapping of assets that can only be borrowed by whitelist
+     */
+    mapping(address => bool) public borrowRestricted;
+
+    /**
+     * @notice Mapping of account addresses that are allowed to borrow restricted assets
+     */
+    mapping(address => bool) public borrowWhitelist;
 
     constructor() public {
         admin = msg.sender;
@@ -3351,6 +3365,11 @@ contract Comptroller is ComptrollerV5Storage, ComptrollerInterface, ComptrollerE
             return uint(Error.PRICE_ERROR);
         }
 
+        if (borrowRestricted[cToken]) {
+            if (!borrowWhitelist[borrower]){
+                return uint(Error.UNAUTHORIZED);
+            }
+        }
 
         uint borrowCap = borrowCaps[cToken];
         // Borrow cap of 0 corresponds to unlimited borrowing
@@ -3740,31 +3759,33 @@ contract Comptroller is ComptrollerV5Storage, ComptrollerInterface, ComptrollerE
             }
             
             vars.oraclePrice = Exp({mantissa: vars.oraclePriceMantissa});
-
+			
 			vars.precomputeTokens = mul_ScalarTruncate(vars.exchangeRate, vars.cTokenBalance);
-
+			
 			vars.postIMFSize = mul_ScalarTruncate(vars.imfFactor, sqrt(vars.precomputeTokens));
-
+			
 			vars.modCollateralFactor = mul_ScalarTruncate(vars.collateralFactor, 1e18);
-
+            
 			vars.preMinDenum = (1000000000000000000 + mul_(1000000000, vars.postIMFSize));
-
+    
 			vars.preMinEnum = 1100000000000000000;
-
+			
 			vars.preMin = div_(mul_(vars.preMinEnum, 1e18), vars.preMinDenum);
-
+            
 			vars.getMin = min(vars.modCollateralFactor, vars.preMin);
+			
 			//convertGetMin to Exp
 			vars.convertedGetMin = Exp({mantissa: vars.getMin});
-            console.log("Collateral Factor: ",vars.getMin);
+            
             // Pre-compute a conversion factor from tokens -> ether (normalized price value)
             vars.tokensToDenom = mul_(mul_(vars.convertedGetMin, vars.exchangeRate), vars.oraclePrice);
+
             // sumCollateral += tokensToDenom * cTokenBalance
             vars.sumCollateral = mul_ScalarTruncateAddUInt(vars.tokensToDenom, vars.cTokenBalance, vars.sumCollateral);
-            console.log("sumCollateral: ", vars.sumCollateral);
+            
             // sumBorrowPlusEffects += oraclePrice * borrowBalance
             vars.sumBorrowPlusEffects = mul_ScalarTruncateAddUInt(vars.oraclePrice, vars.borrowBalance, vars.sumBorrowPlusEffects);
-            console.log("sumBorrowPlusEffects: ", vars.sumBorrowPlusEffects);
+
             // Calculate effects of interacting with cTokenModify
             if (asset == cTokenModify) {
                 // redeem effect
@@ -3981,6 +4002,8 @@ contract Comptroller is ComptrollerV5Storage, ComptrollerInterface, ComptrollerE
         // Note that isComped is not in active use anymore
         markets[address(cToken)] = Market({isListed: true, isComped: false, collateralFactorMantissa: 0, imfFactorMantissa: 0});
 
+        borrowRestricted[address(cToken)] = true;
+
         _addMarketInternal(address(cToken));
 
         emit MarketListed(cToken);
@@ -3996,9 +4019,29 @@ contract Comptroller is ComptrollerV5Storage, ComptrollerInterface, ComptrollerE
     }
 
     /**
+      * @notice Add users to the whitelist, which allows for the borrowing of restricted assets.
+      * @dev Admin function to add users to the whitelist. A whitelisted value of "true" means that a user is whitelisted and can borrow restricted assets.
+      * @param account The addresses users that are added to the whitelist.
+      * @param whitelisted If true, then the user is added to the whitelist. If false, the user is removed.
+      */
+    function _addToWhitelist(address[] calldata account, bool[] calldata whitelisted) external {
+    	require(msg.sender == admin, "only admin can add users to the whitelist"); 
+
+        uint numAccounts = account.length;
+        uint numWhitelist = whitelisted.length;
+
+        require(numAccounts != 0 && numAccounts == numWhitelist, "invalid input");
+
+        for(uint i = 0; i < numAccounts; i++) {
+            borrowWhitelist[address(account[i])] = whitelisted[i];
+            emit NewWhitelistStatus(account[i], whitelisted[i]);
+        }
+    }
+
+    /**
       * @notice Set the given borrow caps for the given cToken markets. Borrowing that brings total borrows to or above borrow cap will revert.
       * @dev Admin or borrowCapGuardian function to set the borrow caps. A borrow cap of 0 corresponds to unlimited borrowing.
-      * @param cTokens The addresses of the markets (tokens) to change the borrow caps for
+      * @param cTokens The addresses of the markets (tokens) to change the borrow caps for.
       * @param newBorrowCaps The new borrow cap values in underlying to be set. A value of 0 corresponds to unlimited borrowing.
       */
     function _setMarketBorrowCaps(CToken[] calldata cTokens, uint[] calldata newBorrowCaps) external {
@@ -4012,6 +4055,26 @@ contract Comptroller is ComptrollerV5Storage, ComptrollerInterface, ComptrollerE
         for(uint i = 0; i < numMarkets; i++) {
             borrowCaps[address(cTokens[i])] = newBorrowCaps[i];
             emit NewBorrowCap(cTokens[i], newBorrowCaps[i]);
+        }
+    }
+
+    /**
+      * @notice Set the given borrow restriction for the given cToken markets.
+      * @dev Admin function to set the borrowing restriction. A borrow restriction of "true" means that a user needs to be whitelisted in order to borrow the underlying asset.
+      * @param cTokens The addresses of the markets (tokens) to change the restriction for
+      * @param borrowRestrictions If true, then the cToken market can only be borrowed by whitelisted accounts
+      */
+    function _setBorrowRestriction(CToken[] calldata cTokens, bool[] calldata borrowRestrictions) external {
+    	require(msg.sender == admin, "only admin can set borrow restrictions"); 
+
+        uint numMarkets = cTokens.length;
+        uint numRestrictions = borrowRestrictions.length;
+
+        require(numMarkets != 0 && numMarkets == numRestrictions, "invalid input");
+
+        for(uint i = 0; i < numMarkets; i++) {
+            borrowRestricted[address(cTokens[i])] = borrowRestrictions[i];
+            emit NewMarketRestriction(cTokens[i], borrowRestrictions[i]);
         }
     }
 

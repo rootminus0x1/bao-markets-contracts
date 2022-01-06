@@ -17,33 +17,22 @@ Which you can skip for now, until the gitbook documentation is published.
 
 Contract  	  					| Address									|Etherscan 																			|Code|
 --------------------------------| ------------------------------------------|-----------------------------------------------------------------------------------|----|
-Comptroller  					| 0x099452149D33E86374bEa74dB96d0a7B038BcA4D|https://ropsten.etherscan.io/address/0x099452149D33E86374bEa74dB96d0a7B038BcA4D	|https://github.com/baofinance/bao-markets-contracts/blob/master/contracts/Comptroller.sol|
-Unitroller  					| 0x8B932257a6b5D20EaD78FB4d5Fd00a19daF937b3|https://ropsten.etherscan.io/address/0x8B932257a6b5D20EaD78FB4d5Fd00a19daF937b3	|https://github.com/baofinance/bao-markets-contracts/blob/master/contracts/Unitroller.sol|
-Oracle  						| 0xf9941b9E8D010d961f7d3D6Aea57a108Bcfe1026|https://ropsten.etherscan.io/address/0xf9941b9E8D010d961f7d3D6Aea57a108Bcfe1026	|https://github.com/baofinance/bao-markets-contracts/blob/master/contracts/Oracle.sol|
-Stabilizer  					| 0xf867C6C7C0eFAD233fA3bdD7eaC62C61F3FD00Cd|https://ropsten.etherscan.io/address/0xf867C6C7C0eFAD233fA3bdD7eaC62C61F3FD00Cd	|https://github.com/baofinance/bao-markets-contracts/blob/master/contracts/Stabilizer.sol|
-Fed  							| 0xcD4544dCa0fb0ad50F89F7cae23D8F4Da53784C5|https://ropsten.etherscan.io/address/0xcD4544dCa0fb0ad50F89F7cae23D8F4Da53784C5	|https://github.com/baofinance/bao-markets-contracts/blob/master/contracts/Fed.sol|
-bUSD ERC20						| 0xDF559301C178221E8D76E4A91126C504Dfe5947a|https://ropsten.etherscan.io/address/0xDF559301C178221E8D76E4A91126C504Dfe5947a	|https://github.com/baofinance/bao-markets-contracts/blob/master/contracts/ERC20.sol|
-bUSD interestrate model  		| 0xA50431c1C5aff4faD72ADcA6f473a729027332F9|https://ropsten.etherscan.io/address/0xA50431c1C5aff4faD72ADcA6f473a729027332F9	|https://github.com/baofinance/bao-markets-contracts/blob/master/contracts/JumpRateModelV2.sol|
-bUSD bdToken					| 0x8584B05012749bdd32E41f8c7eB973D2283d1e56|https://ropsten.etherscan.io/address/0x8584B05012749bdd32E41f8c7eB973D2283d1e56	|https://github.com/baofinance/bao-markets-contracts/blob/master/contracts/CErc20.sol|
-Eth interest rate model  		| 0x9DAC84a0529B35Bc124f1c323ed9eC2Bb9B75066|https://ropsten.etherscan.io/address/0x9DAC84a0529B35Bc124f1c323ed9eC2Bb9B75066	|https://github.com/baofinance/bao-markets-contracts/blob/master/contracts/WhitePaperInterestRateModel.sol|
-Eth bdToken						| 0x1d2728a36dC794e92374e629cC0e7F25C7f60162|https://ropsten.etherscan.io/address/0x1d2728a36dC794e92374e629cC0e7F25C7f60162	|https://github.com/baofinance/bao-markets-contracts/blob/master/contracts/CEther.sol|
-USDC ERC20  					| 0x14bFFDf158D0DbDA11E4e4105e6e2FE1D24F4D2e|https://ropsten.etherscan.io/address/0x14bFFDf158D0DbDA11E4e4105e6e2FE1D24F4D2e	|https://github.com/baofinance/bao-markets-contracts/blob/master/contracts/ERC20.sol|
-USDC interest rate model  		| 0x216c31D2427c3Ca59B70e85A2179717F3134003C|https://ropsten.etherscan.io/address/0x216c31D2427c3Ca59B70e85A2179717F3134003C	|https://github.com/baofinance/bao-markets-contracts/blob/master/contracts/JumpRateModelV2.sol|
-USDC bdToken 					| 0xb4e94d554736C76a9EB44FA1ca561c20AcfdeB26|https://ropsten.etherscan.io/address/0xb4e94d554736C76a9EB44FA1ca561c20AcfdeB26	|https://github.com/baofinance/bao-markets-contracts/blob/master/contracts/CErc20.sol|
-KoreanWon bdToken  				| 0x7c59B99C07fd6c41cb25c9364FcE4d46a58b4Ce3|https://ropsten.etherscan.io/address/0x7c59B99C07fd6c41cb25c9364FcE4d46a58b4Ce3	|https://github.com/baofinance/bao-markets-contracts/blob/master/contracts/CErc20.sol|
-KoreanWon InterestRateModel  	| 0x6dB55A7F24577a3CF4e7b1d1aA99379B0A1b444C|https://ropsten.etherscan.io/address/0x6dB55A7F24577a3CF4e7b1d1aA99379B0A1b444C	|https://github.com/baofinance/bao-markets-contracts/blob/master/contracts/JumpRateModelV2.sol|
-KoreanWon ERC20  				| 0x96b2fab13ea34EE6bAf8aBD8840eb45e4176251b|https://ropsten.etherscan.io/address/0x96b2fab13ea34EE6bAf8aBD8840eb45e4176251b	|https://github.com/baofinance/bao-markets-contracts/blob/master/contracts/ERC20.sol|
-TwoDecimal bdToken  			| 0x53dBc6dF6227838b6609c77037c438D0a33fc446|https://ropsten.etherscan.io/address/0x53dBc6dF6227838b6609c77037c438D0a33fc446	|https://github.com/baofinance/bao-markets-contracts/blob/master/contracts/CErc20.sol|
-TwoDecimal InterestRateModel  	| 0xe9E8878F90943E953dCd744Ec730F278De9D5F3B|https://ropsten.etherscan.io/address/0xe9E8878F90943E953dCd744Ec730F278De9D5F3B	|https://github.com/baofinance/bao-markets-contracts/blob/master/contracts/JumpRateModelV2.sol|
-TwoDecimal ERC20  				| 0x6d6C89CE746284F1d66C4a229cb449b32f494BF5|https://ropsten.etherscan.io/address/0x6d6C89CE746284F1d66C4a229cb449b32f494BF5	|https://github.com/baofinance/bao-markets-contracts/blob/master/contracts/ERC20.sol|
-EightDeciaml bdToken  			| 0x51da2c4A7378c28282Ef3022890A935c56c97E7E|https://ropsten.etherscan.io/address/0x51da2c4A7378c28282Ef3022890A935c56c97E7E	|https://github.com/baofinance/bao-markets-contracts/blob/master/contracts/CErc20.sol|
-EightDeciaml InterestRateModel  | 0xD1ceE226016e7060f54eEF5754f3DC80bD79dA27|https://ropsten.etherscan.io/address/0xD1ceE226016e7060f54eEF5754f3DC80bD79dA27	|https://github.com/baofinance/bao-markets-contracts/blob/master/contracts/JumpRateModelV2.sol|
-EightDeciaml ERC20  			| 0x92Af1BCA5B2A1Ecbd835646D22cbc9b01Fb17600|https://ropsten.etherscan.io/address/0x92Af1BCA5B2A1Ecbd835646D22cbc9b01Fb17600	|https://github.com/baofinance/bao-markets-contracts/blob/master/contracts/ERC20.sol|
-TwelveDecimal bdToken  			| 0x30d5237C74520a99F957B3ad7435350C8D71d791|https://ropsten.etherscan.io/address/0x30d5237C74520a99F957B3ad7435350C8D71d791	|https://github.com/baofinance/bao-markets-contracts/blob/master/contracts/CErc20.sol|
-TwelveDecimal InterestRateModel | 0x1d5848842DeE52EFCA44E3b8Bcc4DEea1111596d|https://ropsten.etherscan.io/address/0x1d5848842DeE52EFCA44E3b8Bcc4DEea1111596d	|https://github.com/baofinance/bao-markets-contracts/blob/master/contracts/JumpRateModelV2.sol|
-TwelveDecimal ERC20  			| 0x44658B8C5996D341064F569cdc3f0BD172600a77|https://ropsten.etherscan.io/address/0x44658B8C5996D341064F569cdc3f0BD172600a77	|https://github.com/baofinance/bao-markets-contracts/blob/master/contracts/ERC20.sol|
-DAI ERC20 (Reserve)  			| 0xDc3c1D7741E454DEC2d2e6CFFe29605E4b7e01e3|https://ropsten.etherscan.io/address/0xDc3c1D7741E454DEC2d2e6CFFe29605E4b7e01e3	|https://github.com/baofinance/bao-markets-contracts/blob/master/contracts/ERC20.sol|
-SushiPool (USDC/bUSD)			| 0x22b4dca09bcede9fb45fd9fc53c17daeed54c306|https://ropsten.etherscan.io/address/0x22b4dca09bcede9fb45fd9fc53c17daeed54c306 										||	
+
+Comptroller  					| 0x4998d11139D51e7b7f2788532E877C095d400Df2|https://ropsten.etherscan.io/address/0x4998d11139D51e7b7f2788532E877C095d400Df2	|https://github.com/baofinance/bao-markets-contracts/blob/master/contracts/Comptroller.sol|
+Unitroller  					| 0xbF2d7626a66aad910173fB43Ffd738A0F82C7f33|https://ropsten.etherscan.io/address/0xbF2d7626a66aad910173fB43Ffd738A0F82C7f33	|https://github.com/baofinance/bao-markets-contracts/blob/master/contracts/Unitroller.sol|
+Oracle  						| 0x48E1654a7F4deB1cd3d9817D44cAebB7f1404f06|https://ropsten.etherscan.io/address/0x48E1654a7F4deB1cd3d9817D44cAebB7f1404f06	|https://github.com/baofinance/bao-markets-contracts/blob/master/contracts/Oracle.sol|
+Stabilizer  					| 0x89BA107c0a767A6eB317F6b1a715A45D05014eB6|https://ropsten.etherscan.io/address/0x89BA107c0a767A6eB317F6b1a715A45D05014eB6	|https://github.com/baofinance/bao-markets-contracts/blob/master/contracts/Stabilizer.sol|
+Fed  							| 0x214C295F655c502B1380fa42B2e069011736E823|https://ropsten.etherscan.io/address/0x214C295F655c502B1380fa42B2e069011736E823	|https://github.com/baofinance/bao-markets-contracts/blob/master/contracts/Fed.sol|
+bUSD ERC20						| 0x0F051F3C818b495ef27AC46462188295F83469A5|https://ropsten.etherscan.io/address/0x0F051F3C818b495ef27AC46462188295F83469A5	|https://github.com/baofinance/bao-markets-contracts/blob/master/contracts/ERC20.sol|
+bUSD interestrate model  		| 0x796661995a1e5179553268619405Fd18F9d7DdAB|https://ropsten.etherscan.io/address/0x796661995a1e5179553268619405Fd18F9d7DdAB	|https://github.com/baofinance/bao-markets-contracts/blob/master/contracts/JumpRateModelV2.sol|
+bUSD bdToken					| 0x63793577FC659243Df8fF731089FBe60d2A36A0d|https://ropsten.etherscan.io/address/0x63793577FC659243Df8fF731089FBe60d2A36A0d	|https://github.com/baofinance/bao-markets-contracts/blob/master/contracts/CErc20.sol|
+Eth interest rate model  		| 0xe9EC37eE8ef8879f077845702fB3e93F0DaA9916|https://ropsten.etherscan.io/address/0xe9EC37eE8ef8879f077845702fB3e93F0DaA9916	|https://github.com/baofinance/bao-markets-contracts/blob/master/contracts/WhitePaperInterestRateModel.sol|
+Eth bdToken						| 0x895952c8290bf311B4848dE954F1A747Bf97809f|https://ropsten.etherscan.io/address/0x895952c8290bf311B4848dE954F1A747Bf97809f	|https://github.com/baofinance/bao-markets-contracts/blob/master/contracts/CEther.sol|
+USDC ERC20  					| 0x48C1be647204eb97BC5C6914e5D60E7A7b7b398B|https://ropsten.etherscan.io/address/0x48C1be647204eb97BC5C6914e5D60E7A7b7b398B	|https://github.com/baofinance/bao-markets-contracts/blob/master/contracts/ERC20.sol|
+USDC interest rate model  		| 0xF5592Ee74fe2657552a25626cF6eB3e0d34d6398|https://ropsten.etherscan.io/address/0xF5592Ee74fe2657552a25626cF6eB3e0d34d6398	|https://github.com/baofinance/bao-markets-contracts/blob/master/contracts/JumpRateModelV2.sol|
+USDC bdToken 					| 0xfA3545f9Cca55088B30223bc86BE1AEe0F86eE62|https://ropsten.etherscan.io/address/0xfA3545f9Cca55088B30223bc86BE1AEe0F86eE62	|https://github.com/baofinance/bao-markets-contracts/blob/master/contracts/CErc20.sol|
+DAI ERC20 (Reserve)  			| 0xf80A32A835F79D7787E8a8ee5721D0fEaFd78108|https://ropsten.etherscan.io/address/0xf80A32A835F79D7787E8a8ee5721D0fEaFd78108	|https://github.com/baofinance/bao-markets-contracts/blob/master/contracts/ERC20.sol|
+
 
 # Ropsten test tokens can be minted using the following contract:
 
@@ -57,10 +46,6 @@ Currently minting is restricted to a token value of $500K per person.
 ## Token Symbol List
 
 USDC <br />
-Kor <br />
-Two <br />
-Eig <br />
-Twe <br />
 
 
 ## Token Decimals
@@ -69,13 +54,9 @@ Twe <br />
 | ------------- |:-------------:|
 | bUSD      	| 18 			|
 | USDC      	| 6      		|
-| Kor 			| 18      		|
-| Two      		| 2 			|
-| Eig      		| 8      		|
-| Twe 			| 12    	  	|
 
 
-Example of minting 30 "Two" tokens:
+Example of minting 30 "USDC" tokens:
 
-`mintToken("Two", YOUR ROPSTEN ADDRESS, 3000)` 
+`mintToken("USDC", YOUR ROPSTEN ADDRESS, 30000000)` 
 

@@ -17,7 +17,6 @@ Which you can skip for now, until the gitbook documentation is published.
 
 Contract  	  					| Address									|Etherscan 																			|Code|
 --------------------------------| ------------------------------------------|-----------------------------------------------------------------------------------|----|
-
 Comptroller  					| 0x4998d11139D51e7b7f2788532E877C095d400Df2|https://ropsten.etherscan.io/address/0x4998d11139D51e7b7f2788532E877C095d400Df2	|https://github.com/baofinance/bao-markets-contracts/blob/master/contracts/Comptroller.sol|
 Unitroller  					| 0xbF2d7626a66aad910173fB43Ffd738A0F82C7f33|https://ropsten.etherscan.io/address/0xbF2d7626a66aad910173fB43Ffd738A0F82C7f33	|https://github.com/baofinance/bao-markets-contracts/blob/master/contracts/Unitroller.sol|
 Oracle  						| 0x48E1654a7F4deB1cd3d9817D44cAebB7f1404f06|https://ropsten.etherscan.io/address/0x48E1654a7F4deB1cd3d9817D44cAebB7f1404f06	|https://github.com/baofinance/bao-markets-contracts/blob/master/contracts/Oracle.sol|
@@ -32,7 +31,6 @@ USDC ERC20  					| 0x48C1be647204eb97BC5C6914e5D60E7A7b7b398B|https://ropsten.et
 USDC interest rate model  		| 0xF5592Ee74fe2657552a25626cF6eB3e0d34d6398|https://ropsten.etherscan.io/address/0xF5592Ee74fe2657552a25626cF6eB3e0d34d6398	|https://github.com/baofinance/bao-markets-contracts/blob/master/contracts/JumpRateModelV2.sol|
 USDC bdToken 					| 0xfA3545f9Cca55088B30223bc86BE1AEe0F86eE62|https://ropsten.etherscan.io/address/0xfA3545f9Cca55088B30223bc86BE1AEe0F86eE62	|https://github.com/baofinance/bao-markets-contracts/blob/master/contracts/CErc20.sol|
 DAI ERC20 (Reserve)  			| 0xf80A32A835F79D7787E8a8ee5721D0fEaFd78108|https://ropsten.etherscan.io/address/0xf80A32A835F79D7787E8a8ee5721D0fEaFd78108	|https://github.com/baofinance/bao-markets-contracts/blob/master/contracts/ERC20.sol|
-
 
 # Ropsten test tokens can be minted using the following contract:
 

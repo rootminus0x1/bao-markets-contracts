@@ -23,7 +23,7 @@ async function main() {
     ////////////////////////////////////////
 
     //Deploy Oracle 
-    const oracleFactory = await ethers.getContractFactory("Oracle");
+    const oracleFactory = await ethers.getContractFactory("contracts/Oracle.sol:Oracle");
     oracleContract = await oracleFactory.deploy();
     await oracleContract.deployTransaction.wait();
     console.log("Oracle Deployed");
@@ -39,7 +39,7 @@ async function main() {
     console.log("Price Feeds Deployed");
 
     // Deploy Comptroller
-    const comptrollerFactory = await ethers.getContractFactory("Comptroller");
+    const comptrollerFactory = await ethers.getContractFactory("contracts/Comptroller.sol:Comptroller");
     comptrollerContract = await comptrollerFactory.deploy();
     await comptrollerContract.deployTransaction.wait();
     originalcomptrollerAddress = comptrollerContract.address;
@@ -53,7 +53,7 @@ async function main() {
     const setApproveNewImplementationTx = await comptrollerContract._become(unitrollerContract.address);
     await setApproveNewImplementationTx.wait();
     //We are addressing the Unitroller, which delegates to comptroller
-    comptrollerContract = await ethers.getContractAt("Comptroller", unitrollerContract.address);
+    comptrollerContract = await ethers.getContractAt("contracts/Comptroller.sol:Comptroller", unitrollerContract.address);
     console.log("Comptroller Deployed");
 
     // Deploy synth ERC20 (Underlying token)
@@ -67,7 +67,7 @@ async function main() {
 
     // Deploy InterestRateModel
     //For Synth
-    const JumpRateModelFactory = await ethers.getContractFactory("JumpRateModelV2");
+    const JumpRateModelFactory = await ethers.getContractFactory("contracts/JumpRateModelV2.sol:JumpRateModelV2");
     JumpRateModelContract = await JumpRateModelFactory.deploy(
         "0", //uint baseRatePerYear
         "39999999999981600", //uint multiplierPerYear
@@ -86,13 +86,13 @@ async function main() {
     );
     await USDCJumpRateModelContract.deployTransaction.wait(); 
     // For ETH
-    const WhitePaperModelFactory = await ethers.getContractFactory("WhitePaperInterestRateModel");
+    const WhitePaperModelFactory = await ethers.getContractFactory("contracts/WhitePaperInterestRateModel.sol:WhitePaperInterestRateModel");
     WhitePaperModelContract = await WhitePaperModelFactory.deploy("0","39999999999981600");
     await WhitePaperModelContract.deployTransaction.wait(); 
     console.log("Interest Rates Deployed");
     
     //Deploy bdSynth
-    const cERC20ImmunatbleFactory = await ethers.getContractFactory("CErc20Immutable");
+    const cERC20ImmunatbleFactory = await ethers.getContractFactory("contracts/CToken/CErc20.sol:CErc20Immutable");
     cERC20ImmunatbleContract = await cERC20ImmunatbleFactory.deploy(
         ERC20Contract.address,  //address underlying_
         unitrollerContract.address, //ComptrollerInterface comptroller_
@@ -131,7 +131,7 @@ async function main() {
     console.log("bdTokens Deployed");
 
     //Deploy Fed
-    const fedFactory = await ethers.getContractFactory("Fed");
+    const fedFactory = await ethers.getContractFactory("contracts/Fed.sol:Fed");
     fedContract = await fedFactory.deploy(cERC20ImmunatbleContract.address, (await ethers.getSigners())[0].address); //CErc20 ctoken_, address gov_ 
     await fedContract.deployTransaction.wait();
     console.log("Fed Deployed");

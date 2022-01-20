@@ -1,4 +1,5 @@
 import "../Utils/ErrorReporter.sol";
+import "../Utils/FixedPointMathLib.sol";
 
 pragma solidity ^0.5.16;
 
@@ -990,6 +991,8 @@ contract ComptrollerInterface {
  * @author Compound
  */
 contract CToken is CTokenInterface, Exponential, TokenErrorReporter {
+    using FixedPointMathLib for uint256;
+
     /**
      * @notice Initialize the money market
      * @param comptroller_ The address of the Comptroller
@@ -1158,19 +1161,6 @@ contract CToken is CTokenInterface, Exponential, TokenErrorReporter {
     }
 
     /**
-     * @notice Get the underlying balance of the `owner`
-     * @dev This also accrues interest in a transaction
-     * @param owner The address of the account to query
-     * @return The amount of underlying owned by `owner`
-     */
-    function balanceOfUnderlying(address owner) external returns (uint) {
-        Exp memory exchangeRate = Exp({mantissa: exchangeRateCurrent()});
-        (MathError mErr, uint balance) = mulScalarTruncate(exchangeRate, accountTokens[owner]);
-        require(mErr == MathError.NO_ERROR, "balance could not be calculated");
-        return balance;
-    }
-
-    /**
      * @notice Get a snapshot of the account's balances, and the cached exchange rate
      * @dev This is used by comptroller to more efficiently perform liquidity checks.
      * @param account Address of the account to snapshot
@@ -1285,16 +1275,6 @@ contract CToken is CTokenInterface, Exponential, TokenErrorReporter {
         }
 
         return (MathError.NO_ERROR, result);
-    }
-
-    /**
-     * @author Modified from transmissions11 (https://github.com/transmissions11/libcompound/blob/main/src/LibCompound.sol)
-     * @notice Accrue interest then return the up-to-date exchange rate
-     * @return Calculated exchange rate scaled by 1e18
-     */
-    function exchangeRateCurrent() public nonReentrant returns (uint) {
-        require(accrueInterest() == uint(Error.NO_ERROR), "accrue interest failed");
-        return exchangeRateStored();
     }
 
     /**
@@ -2518,6 +2498,49 @@ contract CErc20 is CToken, CErc20Interface {
      */
     function _addReserves(uint addAmount) external returns (uint) {
         return _addReservesInternal(addAmount);
+    }
+
+    /**
+     * @author Modified from transmissions11 (https://github.com/transmissions11/libcompound/blob/main/src/LibCompound.sol)
+     * @return Calculated exchange rate scaled by 1e18
+     */
+    function exchangeRateCurrent() public view returns (uint) {
+
+        uint256 accrualBlockNumberPrior = accrualBlockNumber;
+
+        if (accrualBlockNumberPrior == block.number) return exchangeRateStored();
+
+        uint256 totalCash = EIP20Interface(underlying).balanceOf(address(this));
+        uint256 borrowsPrior = totalBorrows;
+        uint256 reservesPrior = totalReserves;
+
+        uint256 borrowRateMantissa = interestRateModel.getBorrowRate(totalCash, borrowsPrior, reservesPrior);
+
+        require(borrowRateMantissa <= 0.0005e16, "RATE_TOO_HIGH");
+
+        uint256 interestAccumulated = (borrowRateMantissa * (block.number - accrualBlockNumberPrior)).fmul(
+            borrowsPrior,
+            1e18
+        );
+
+        uint256 currentTotalReserves = reserveFactorMantissa.fmul(interestAccumulated, 1e18) + reservesPrior;
+        uint256 currentNewTotalBorrows = interestAccumulated + borrowsPrior;
+        uint256 currentTotalSupply = totalSupply;
+
+        return
+            totalSupply == 0
+                ? initialExchangeRateMantissa
+                : (totalCash + currentNewTotalBorrows - currentTotalReserves).fdiv(currentTotalSupply, 1e18);
+    }
+
+    /**
+     * @notice Get the underlying balance of the `owner`
+     * @author Modified from transmissions11 (https://github.com/transmissions11/libcompound/blob/main/src/LibCompound.sol)
+     * @param owner The address of the account to query
+     * @return The amount of underlying owned by `owner`
+     */
+    function balanceOfUnderlying(address owner) external view returns (uint) {
+        return accountTokens[owner].fmul(exchangeRateCurrent(), 1e18);
     }
 
     /*** Safe Token ***/

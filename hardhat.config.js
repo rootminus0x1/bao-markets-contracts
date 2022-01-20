@@ -27,7 +27,7 @@ require("hardhat-gas-reporter");
   solidity: {
     compilers: [
       {
-        version: "0.5.16",
+        version: "0.8.1",
         settings: {
           optimizer: {
             enabled: true,
@@ -36,7 +36,7 @@ require("hardhat-gas-reporter");
         },
       },
       {
-        version: "0.8.1",
+        version: "0.5.16",
         settings: {
           optimizer: {
             enabled: true,
@@ -47,7 +47,7 @@ require("hardhat-gas-reporter");
     ],
   },
   mocha: {
-    timeout: 1000000000
+    timeout: 10000000000
   },
   gasReporter: {
     enabled: false,

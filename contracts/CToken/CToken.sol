@@ -1,4 +1,4 @@
-// File: EIP20NonStandardInterface.sol
+import "../Utils/ErrorReporter.sol";
 
 pragma solidity ^0.5.16;
 
@@ -71,10 +71,6 @@ interface EIP20NonStandardInterface {
     event Approval(address indexed owner, address indexed spender, uint256 amount);
 }
 
-// File: EIP20Interface.sol
-
-pragma solidity ^0.5.16;
-
 /**
  * @title ERC 20 Token Standard Interface
  *  https://eips.ethereum.org/EIPS/eip-20
@@ -135,10 +131,6 @@ interface EIP20Interface {
     event Transfer(address indexed from, address indexed to, uint256 amount);
     event Approval(address indexed owner, address indexed spender, uint256 amount);
 }
-
-// File: ExponentialNoError.sol
-
-pragma solidity ^0.5.16;
 
 /**
  * @title Exponential module for storing fixed-precision decimals
@@ -334,10 +326,6 @@ contract ExponentialNoError {
     }
 }
 
-// File: CarefulMath.sol
-
-pragma solidity ^0.5.16;
-
 /**
   * @title Careful Math
   * @author Compound
@@ -421,11 +409,6 @@ contract CarefulMath {
         return subUInt(sum, c);
     }
 }
-// File: Exponential.sol
-
-pragma solidity ^0.5.16;
-
-
 
 /**
  * @title Exponential module for storing fixed-precision decimals
@@ -606,219 +589,6 @@ contract Exponential is CarefulMath, ExponentialNoError {
     }
 }
 
-// File: ErrorReporter.sol
-
-pragma solidity ^0.5.16;
-
-contract ComptrollerErrorReporter {
-    enum Error {
-        NO_ERROR,
-        UNAUTHORIZED,
-        COMPTROLLER_MISMATCH,
-        INSUFFICIENT_SHORTFALL,
-        INSUFFICIENT_LIQUIDITY,
-        INVALID_CLOSE_FACTOR,
-        INVALID_COLLATERAL_FACTOR,
-        INVALID_LIQUIDATION_INCENTIVE,
-        MARKET_NOT_ENTERED, // no longer possible
-        MARKET_NOT_LISTED,
-        MARKET_ALREADY_LISTED,
-        MATH_ERROR,
-        NONZERO_BORROW_BALANCE,
-        PRICE_ERROR,
-        REJECTION,
-        SNAPSHOT_ERROR,
-        TOO_MANY_ASSETS,
-        TOO_MUCH_REPAY
-    }
-
-    enum FailureInfo {
-        ACCEPT_ADMIN_PENDING_ADMIN_CHECK,
-        ACCEPT_PENDING_IMPLEMENTATION_ADDRESS_CHECK,
-        EXIT_MARKET_BALANCE_OWED,
-        EXIT_MARKET_REJECTION,
-        SET_CLOSE_FACTOR_OWNER_CHECK,
-        SET_CLOSE_FACTOR_VALIDATION,
-        SET_COLLATERAL_FACTOR_OWNER_CHECK,
-        SET_COLLATERAL_FACTOR_NO_EXISTS,
-        SET_COLLATERAL_FACTOR_VALIDATION,
-        SET_COLLATERAL_FACTOR_WITHOUT_PRICE,
-        SET_IMPLEMENTATION_OWNER_CHECK,
-        SET_LIQUIDATION_INCENTIVE_OWNER_CHECK,
-        SET_LIQUIDATION_INCENTIVE_VALIDATION,
-        SET_MAX_ASSETS_OWNER_CHECK,
-        SET_PENDING_ADMIN_OWNER_CHECK,
-        SET_PENDING_IMPLEMENTATION_OWNER_CHECK,
-        SET_PRICE_ORACLE_OWNER_CHECK,
-        SUPPORT_MARKET_EXISTS,
-        SUPPORT_MARKET_OWNER_CHECK,
-        SET_PAUSE_GUARDIAN_OWNER_CHECK
-    }
-
-    /**
-      * @dev `error` corresponds to enum Error; `info` corresponds to enum FailureInfo, and `detail` is an arbitrary
-      * contract-specific code that enables us to report opaque error codes from upgradeable contracts.
-      **/
-    event Failure(uint error, uint info, uint detail);
-
-    /**
-      * @dev use this when reporting a known error from the money market or a non-upgradeable collaborator
-      */
-    function fail(Error err, FailureInfo info) internal returns (uint) {
-        emit Failure(uint(err), uint(info), 0);
-
-        return uint(err);
-    }
-
-    /**
-      * @dev use this when reporting an opaque error from an upgradeable collaborator contract
-      */
-    function failOpaque(Error err, FailureInfo info, uint opaqueError) internal returns (uint) {
-        emit Failure(uint(err), uint(info), opaqueError);
-
-        return uint(err);
-    }
-}
-
-contract TokenErrorReporter {
-    enum Error {
-        NO_ERROR,
-        UNAUTHORIZED,
-        BAD_INPUT,
-        COMPTROLLER_REJECTION,
-        COMPTROLLER_CALCULATION_ERROR,
-        INTEREST_RATE_MODEL_ERROR,
-        INVALID_ACCOUNT_PAIR,
-        INVALID_CLOSE_AMOUNT_REQUESTED,
-        INVALID_COLLATERAL_FACTOR,
-        MATH_ERROR,
-        MARKET_NOT_FRESH,
-        MARKET_NOT_LISTED,
-        TOKEN_INSUFFICIENT_ALLOWANCE,
-        TOKEN_INSUFFICIENT_BALANCE,
-        TOKEN_INSUFFICIENT_CASH,
-        TOKEN_TRANSFER_IN_FAILED,
-        TOKEN_TRANSFER_OUT_FAILED
-    }
-
-    /*
-     * Note: FailureInfo (but not Error) is kept in alphabetical order
-     *       This is because FailureInfo grows significantly faster, and
-     *       the order of Error has some meaning, while the order of FailureInfo
-     *       is entirely arbitrary.
-     */
-    enum FailureInfo {
-        ACCEPT_ADMIN_PENDING_ADMIN_CHECK,
-        ACCRUE_INTEREST_ACCUMULATED_INTEREST_CALCULATION_FAILED,
-        ACCRUE_INTEREST_BORROW_RATE_CALCULATION_FAILED,
-        ACCRUE_INTEREST_NEW_BORROW_INDEX_CALCULATION_FAILED,
-        ACCRUE_INTEREST_NEW_TOTAL_BORROWS_CALCULATION_FAILED,
-        ACCRUE_INTEREST_NEW_TOTAL_RESERVES_CALCULATION_FAILED,
-        ACCRUE_INTEREST_SIMPLE_INTEREST_FACTOR_CALCULATION_FAILED,
-        BORROW_ACCUMULATED_BALANCE_CALCULATION_FAILED,
-        BORROW_ACCRUE_INTEREST_FAILED,
-        BORROW_CASH_NOT_AVAILABLE,
-        BORROW_FRESHNESS_CHECK,
-        BORROW_NEW_TOTAL_BALANCE_CALCULATION_FAILED,
-        BORROW_NEW_ACCOUNT_BORROW_BALANCE_CALCULATION_FAILED,
-        BORROW_MARKET_NOT_LISTED,
-        BORROW_COMPTROLLER_REJECTION,
-        LIQUIDATE_ACCRUE_BORROW_INTEREST_FAILED,
-        LIQUIDATE_ACCRUE_COLLATERAL_INTEREST_FAILED,
-        LIQUIDATE_COLLATERAL_FRESHNESS_CHECK,
-        LIQUIDATE_COMPTROLLER_REJECTION,
-        LIQUIDATE_COMPTROLLER_CALCULATE_AMOUNT_SEIZE_FAILED,
-        LIQUIDATE_CLOSE_AMOUNT_IS_UINT_MAX,
-        LIQUIDATE_CLOSE_AMOUNT_IS_ZERO,
-        LIQUIDATE_FRESHNESS_CHECK,
-        LIQUIDATE_LIQUIDATOR_IS_BORROWER,
-        LIQUIDATE_REPAY_BORROW_FRESH_FAILED,
-        LIQUIDATE_SEIZE_BALANCE_INCREMENT_FAILED,
-        LIQUIDATE_SEIZE_BALANCE_DECREMENT_FAILED,
-        LIQUIDATE_SEIZE_COMPTROLLER_REJECTION,
-        LIQUIDATE_SEIZE_LIQUIDATOR_IS_BORROWER,
-        LIQUIDATE_SEIZE_TOO_MUCH,
-        MINT_ACCRUE_INTEREST_FAILED,
-        MINT_COMPTROLLER_REJECTION,
-        MINT_EXCHANGE_CALCULATION_FAILED,
-        MINT_EXCHANGE_RATE_READ_FAILED,
-        MINT_FRESHNESS_CHECK,
-        MINT_NEW_ACCOUNT_BALANCE_CALCULATION_FAILED,
-        MINT_NEW_TOTAL_SUPPLY_CALCULATION_FAILED,
-        MINT_TRANSFER_IN_FAILED,
-        MINT_TRANSFER_IN_NOT_POSSIBLE,
-        REDEEM_ACCRUE_INTEREST_FAILED,
-        REDEEM_COMPTROLLER_REJECTION,
-        REDEEM_EXCHANGE_TOKENS_CALCULATION_FAILED,
-        REDEEM_EXCHANGE_AMOUNT_CALCULATION_FAILED,
-        REDEEM_EXCHANGE_RATE_READ_FAILED,
-        REDEEM_FRESHNESS_CHECK,
-        REDEEM_NEW_ACCOUNT_BALANCE_CALCULATION_FAILED,
-        REDEEM_NEW_TOTAL_SUPPLY_CALCULATION_FAILED,
-        REDEEM_TRANSFER_OUT_NOT_POSSIBLE,
-        REDUCE_RESERVES_ACCRUE_INTEREST_FAILED,
-        REDUCE_RESERVES_ADMIN_CHECK,
-        REDUCE_RESERVES_CASH_NOT_AVAILABLE,
-        REDUCE_RESERVES_FRESH_CHECK,
-        REDUCE_RESERVES_VALIDATION,
-        REPAY_BEHALF_ACCRUE_INTEREST_FAILED,
-        REPAY_BORROW_ACCRUE_INTEREST_FAILED,
-        REPAY_BORROW_ACCUMULATED_BALANCE_CALCULATION_FAILED,
-        REPAY_BORROW_COMPTROLLER_REJECTION,
-        REPAY_BORROW_FRESHNESS_CHECK,
-        REPAY_BORROW_NEW_ACCOUNT_BORROW_BALANCE_CALCULATION_FAILED,
-        REPAY_BORROW_NEW_TOTAL_BALANCE_CALCULATION_FAILED,
-        REPAY_BORROW_TRANSFER_IN_NOT_POSSIBLE,
-        SET_COLLATERAL_FACTOR_OWNER_CHECK,
-        SET_COLLATERAL_FACTOR_VALIDATION,
-        SET_COMPTROLLER_OWNER_CHECK,
-        SET_INTEREST_RATE_MODEL_ACCRUE_INTEREST_FAILED,
-        SET_INTEREST_RATE_MODEL_FRESH_CHECK,
-        SET_INTEREST_RATE_MODEL_OWNER_CHECK,
-        SET_MAX_ASSETS_OWNER_CHECK,
-        SET_ORACLE_MARKET_NOT_LISTED,
-        SET_PENDING_ADMIN_OWNER_CHECK,
-        SET_RESERVE_FACTOR_ACCRUE_INTEREST_FAILED,
-        SET_RESERVE_FACTOR_ADMIN_CHECK,
-        SET_RESERVE_FACTOR_FRESH_CHECK,
-        SET_RESERVE_FACTOR_BOUNDS_CHECK,
-        TRANSFER_COMPTROLLER_REJECTION,
-        TRANSFER_NOT_ALLOWED,
-        TRANSFER_NOT_ENOUGH,
-        TRANSFER_TOO_MUCH,
-        ADD_RESERVES_ACCRUE_INTEREST_FAILED,
-        ADD_RESERVES_FRESH_CHECK,
-        ADD_RESERVES_TRANSFER_IN_NOT_POSSIBLE
-    }
-
-    /**
-      * @dev `error` corresponds to enum Error; `info` corresponds to enum FailureInfo, and `detail` is an arbitrary
-      * contract-specific code that enables us to report opaque error codes from upgradeable contracts.
-      **/
-    event Failure(uint error, uint info, uint detail);
-
-    /**
-      * @dev use this when reporting a known error from the money market or a non-upgradeable collaborator
-      */
-    function fail(Error err, FailureInfo info) internal returns (uint) {
-        emit Failure(uint(err), uint(info), 0);
-
-        return uint(err);
-    }
-
-    /**
-      * @dev use this when reporting an opaque error from an upgradeable collaborator contract
-      */
-    function failOpaque(Error err, FailureInfo info, uint opaqueError) internal returns (uint) {
-        emit Failure(uint(err), uint(info), opaqueError);
-
-        return uint(err);
-    }
-}
-// File: InterestRateModel.sol
-
-pragma solidity ^0.5.16;
-
 /**
   * @title Compound's InterestRateModel Interface
   * @author Compound
@@ -847,12 +617,6 @@ contract InterestRateModel {
     function getSupplyRate(uint cash, uint borrows, uint reserves, uint reserveFactorMantissa) external view returns (uint);
 
 }
-
-// File: CTokenInterfaces.sol
-
-pragma solidity ^0.5.16;
-
-
 
 contract CTokenStorage {
     /**
@@ -1067,14 +831,12 @@ contract CTokenInterface is CTokenStorage {
     function approve(address spender, uint amount) external returns (bool);
     function allowance(address owner, address spender) external view returns (uint);
     function balanceOf(address owner) external view returns (uint);
-    function balanceOfUnderlying(address owner) external returns (uint);
     function getAccountSnapshot(address account) external view returns (uint, uint, uint, uint);
     function borrowRatePerBlock() external view returns (uint);
     function supplyRatePerBlock() external view returns (uint);
     function totalBorrowsCurrent() external returns (uint);
     function borrowBalanceCurrent(address account) external returns (uint);
     function borrowBalanceStored(address account) public view returns (uint);
-    function exchangeRateCurrent() public returns (uint);
     function exchangeRateStored() public view returns (uint);
     function getCash() external view returns (uint);
     function accrueInterest() public returns (uint);
@@ -1152,10 +914,6 @@ contract CDelegateInterface is CDelegationStorage {
     function _resignImplementation() public;
 }
 
-// File: ComptrollerInterface.sol
-
-pragma solidity ^0.5.16;
-
 contract ComptrollerInterface {
     /// @notice Indicator that this is a Comptroller contract (for inspection)
     bool public constant isComptroller = true;
@@ -1225,17 +983,6 @@ contract ComptrollerInterface {
         address cTokenCollateral,
         uint repayAmount) external view returns (uint, uint);
 }
-
-// File: CToken.sol
-
-pragma solidity ^0.5.16;
-
-
-
-
-
-
-
 
 /**
  * @title Compound's CToken Contract
@@ -1541,6 +1288,7 @@ contract CToken is CTokenInterface, Exponential, TokenErrorReporter {
     }
 
     /**
+     * @author Modified from transmissions11 (https://github.com/transmissions11/libcompound/blob/main/src/LibCompound.sol)
      * @notice Accrue interest then return the up-to-date exchange rate
      * @return Calculated exchange rate scaled by 1e18
      */
@@ -2286,6 +2034,7 @@ contract CToken is CTokenInterface, Exponential, TokenErrorReporter {
         MathError mathErr;
         uint borrowerTokensNew;
         uint liquidatorTokensNew;
+
         /*
          * We calculate the new borrower and liquidator token balances, failing on underflow/overflow:
          *  borrowerTokensNew = accountTokens[borrower] - seizeTokens
@@ -2295,11 +2044,12 @@ contract CToken is CTokenInterface, Exponential, TokenErrorReporter {
         if (mathErr != MathError.NO_ERROR) {
             return failOpaque(Error.MATH_ERROR, FailureInfo.LIQUIDATE_SEIZE_BALANCE_DECREMENT_FAILED, uint(mathErr));
         }
-        
+
         (mathErr, liquidatorTokensNew) = addUInt(accountTokens[liquidator], seizeTokens);
         if (mathErr != MathError.NO_ERROR) {
             return failOpaque(Error.MATH_ERROR, FailureInfo.LIQUIDATE_SEIZE_BALANCE_INCREMENT_FAILED, uint(mathErr));
         }
+
         /////////////////////////
         // EFFECTS & INTERACTIONS
         // (No safe failures beyond this point)
@@ -2654,53 +2404,48 @@ contract CToken is CTokenInterface, Exponential, TokenErrorReporter {
     }
 }
 
-// File: CEther.sol
-
-pragma solidity ^0.5.16;
-
-
 /**
- * @title Compound's CEther Contract
- * @notice CToken which wraps Ether
+ * @title Compound's CErc20 Contract
+ * @notice CTokens which wrap an EIP-20 underlying
  * @author Compound
  */
-contract CEther is CToken {
+contract CErc20 is CToken, CErc20Interface {
     /**
-     * @notice Construct a new CEther money market
+     * @notice Initialize the new money market
+     * @param underlying_ The address of the underlying asset
      * @param comptroller_ The address of the Comptroller
      * @param interestRateModel_ The address of the interest rate model
      * @param initialExchangeRateMantissa_ The initial exchange rate, scaled by 1e18
      * @param name_ ERC-20 name of this token
      * @param symbol_ ERC-20 symbol of this token
      * @param decimals_ ERC-20 decimal precision of this token
-     * @param admin_ Address of the administrator of this token
      */
-    constructor(ComptrollerInterface comptroller_,
-                InterestRateModel interestRateModel_,
-                uint initialExchangeRateMantissa_,
-                string memory name_,
-                string memory symbol_,
-                uint8 decimals_,
-                address payable admin_) public {
-        // Creator of the contract is admin during initialization
-        admin = msg.sender;
+    function initialize(address underlying_,
+                        ComptrollerInterface comptroller_,
+                        InterestRateModel interestRateModel_,
+                        uint initialExchangeRateMantissa_,
+                        string memory name_,
+                        string memory symbol_,
+                        uint8 decimals_) public {
+        // CToken initialize does the bulk of the work
+        super.initialize(comptroller_, interestRateModel_, initialExchangeRateMantissa_, name_, symbol_, decimals_);
 
-        initialize(comptroller_, interestRateModel_, initialExchangeRateMantissa_, name_, symbol_, decimals_);
-
-        // Set the proper admin now that initialization is done
-        admin = admin_;
+        // Set underlying and sanity check it
+        underlying = underlying_;
+        EIP20Interface(underlying).totalSupply();
     }
-
 
     /*** User Interface ***/
 
     /**
      * @notice Sender supplies assets into the market and receives cTokens in exchange
-     * @dev Reverts upon any failure
+     * @dev Accrues interest whether or not the operation succeeds, unless reverted
+     * @param mintAmount The amount of the underlying asset to supply
+     * @return uint 0=success, otherwise a failure (see ErrorReporter.sol for details)
      */
-    function mint() external payable {
-        (uint err,) = mintInternal(msg.value);
-        requireNoError(err, "mint failed");
+    function mint(uint mintAmount) external returns (uint) {
+        (uint err,) = mintInternal(mintAmount);
+        return err;
     }
 
     /**
@@ -2734,92 +2479,122 @@ contract CEther is CToken {
 
     /**
      * @notice Sender repays their own borrow
-     * @dev Reverts upon any failure
+     * @param repayAmount The amount to repay
+     * @return uint 0=success, otherwise a failure (see ErrorReporter.sol for details)
      */
-    function repayBorrow() external payable {
-        (uint err,) = repayBorrowInternal(msg.value);
-        requireNoError(err, "repayBorrow failed");
+    function repayBorrow(uint repayAmount) external returns (uint) {
+        (uint err,) = repayBorrowInternal(repayAmount);
+        return err;
     }
 
     /**
      * @notice Sender repays a borrow belonging to borrower
-     * @dev Reverts upon any failure
      * @param borrower the account with the debt being payed off
+     * @param repayAmount The amount to repay
+     * @return uint 0=success, otherwise a failure (see ErrorReporter.sol for details)
      */
-    function repayBorrowBehalf(address borrower) external payable {
-        (uint err,) = repayBorrowBehalfInternal(borrower, msg.value);
-        requireNoError(err, "repayBorrowBehalf failed");
+    function repayBorrowBehalf(address borrower, uint repayAmount) external returns (uint) {
+        (uint err,) = repayBorrowBehalfInternal(borrower, repayAmount);
+        return err;
     }
 
     /**
      * @notice The sender liquidates the borrowers collateral.
      *  The collateral seized is transferred to the liquidator.
-     * @dev Reverts upon any failure
      * @param borrower The borrower of this cToken to be liquidated
+     * @param repayAmount The amount of the underlying borrowed asset to repay
      * @param cTokenCollateral The market in which to seize collateral from the borrower
+     * @return uint 0=success, otherwise a failure (see ErrorReporter.sol for details)
      */
-    function liquidateBorrow(address borrower, CToken cTokenCollateral) external payable {
-        (uint err,) = liquidateBorrowInternal(borrower, msg.value, cTokenCollateral);
-        requireNoError(err, "liquidateBorrow failed");
+    function liquidateBorrow(address borrower, uint repayAmount, CTokenInterface cTokenCollateral) external returns (uint) {
+        (uint err,) = liquidateBorrowInternal(borrower, repayAmount, cTokenCollateral);
+        return err;
     }
 
     /**
-     * @notice Send Ether to CEther to mint
+     * @notice The sender adds to reserves.
+     * @param addAmount The amount fo underlying token to add as reserves
+     * @return uint 0=success, otherwise a failure (see ErrorReporter.sol for details)
      */
-    function () external payable {
-        (uint err,) = mintInternal(msg.value);
-        requireNoError(err, "mint failed");
+    function _addReserves(uint addAmount) external returns (uint) {
+        return _addReservesInternal(addAmount);
     }
 
     /*** Safe Token ***/
 
     /**
-     * @notice Gets balance of this contract in terms of Ether, before this message
+     * @notice Gets balance of this contract in terms of the underlying
      * @dev This excludes the value of the current message, if any
-     * @return The quantity of Ether owned by this contract
+     * @return The quantity of underlying tokens owned by this contract
      */
     function getCashPrior() internal view returns (uint) {
-        (MathError err, uint startingBalance) = subUInt(address(this).balance, msg.value);
-        require(err == MathError.NO_ERROR);
-        return startingBalance;
+        EIP20Interface token = EIP20Interface(underlying);
+        return token.balanceOf(address(this));
     }
 
     /**
-     * @notice Perform the actual transfer in, which is a no-op
-     * @param from Address sending the Ether
-     * @param amount Amount of Ether being sent
-     * @return The actual amount of Ether transferred
+     * @dev Similar to EIP20 transfer, except it handles a False result from `transferFrom` and reverts in that case.
+     *      This will revert due to insufficient balance or insufficient allowance.
+     *      This function returns the actual amount received,
+     *      which may be less than `amount` if there is a fee attached to the transfer.
+     *
+     *      Note: This wrapper safely handles non-standard ERC-20 tokens that do not return a value.
+     *            See here: https://medium.com/coinmonks/missing-return-value-bug-at-least-130-tokens-affected-d67bf08521ca
      */
     function doTransferIn(address from, uint amount) internal returns (uint) {
-        // Sanity checks
-        require(msg.sender == from, "sender mismatch");
-        require(msg.value == amount, "value mismatch");
-        return amount;
+        EIP20NonStandardInterface token = EIP20NonStandardInterface(underlying);
+        uint balanceBefore = EIP20Interface(underlying).balanceOf(address(this));
+        token.transferFrom(from, address(this), amount);
+
+        bool success;
+        assembly {
+            switch returndatasize()
+                case 0 {                       // This is a non-standard ERC-20
+                    success := not(0)          // set success to true
+                }
+                case 32 {                      // This is a compliant ERC-20
+                    returndatacopy(0, 0, 32)
+                    success := mload(0)        // Set `success = returndata` of external call
+                }
+                default {                      // This is an excessively non-compliant ERC-20, revert.
+                    revert(0, 0)
+                }
+        }
+        require(success, "TOKEN_TRANSFER_IN_FAILED");
+
+        // Calculate the amount that was *actually* transferred
+        uint balanceAfter = EIP20Interface(underlying).balanceOf(address(this));
+        require(balanceAfter >= balanceBefore, "TOKEN_TRANSFER_IN_OVERFLOW");
+        return balanceAfter - balanceBefore;   // underflow already checked above, just subtract
     }
 
+    /**
+     * @dev Similar to EIP20 transfer, except it handles a False success from `transfer` and returns an explanatory
+     *      error code rather than reverting. If caller has not called checked protocol's balance, this may revert due to
+     *      insufficient cash held in this contract. If caller has checked protocol's balance prior to this call, and verified
+     *      it is >= amount, this should not revert in normal conditions.
+     *
+     *      Note: This wrapper safely handles non-standard ERC-20 tokens that do not return a value.
+     *            See here: https://medium.com/coinmonks/missing-return-value-bug-at-least-130-tokens-affected-d67bf08521ca
+     */
     function doTransferOut(address payable to, uint amount) internal {
-        /* Send the Ether, with minimal gas and revert on failure */
-        to.transfer(amount);
-    }
+        EIP20NonStandardInterface token = EIP20NonStandardInterface(underlying);
+        token.transfer(to, amount);
 
-    function requireNoError(uint errCode, string memory message) internal pure {
-        if (errCode == uint(Error.NO_ERROR)) {
-            return;
+        bool success;
+        assembly {
+            switch returndatasize()
+                case 0 {                      // This is a non-standard ERC-20
+                    success := not(0)          // set success to true
+                }
+                case 32 {                     // This is a complaint ERC-20
+                    returndatacopy(0, 0, 32)
+                    success := mload(0)        // Set `success = returndata` of external call
+                }
+                default {                     // This is an excessively non-compliant ERC-20, revert.
+                    revert(0, 0)
+                }
         }
-
-        bytes memory fullMessage = new bytes(bytes(message).length + 5);
-        uint i;
-
-        for (i = 0; i < bytes(message).length; i++) {
-            fullMessage[i] = bytes(message)[i];
-        }
-
-        fullMessage[i+0] = byte(uint8(32));
-        fullMessage[i+1] = byte(uint8(40));
-        fullMessage[i+2] = byte(uint8(48 + ( errCode / 10 )));
-        fullMessage[i+3] = byte(uint8(48 + ( errCode % 10 )));
-        fullMessage[i+4] = byte(uint8(41));
-
-        require(errCode == uint(Error.NO_ERROR), string(fullMessage));
+        require(success, "TOKEN_TRANSFER_OUT_FAILED");
     }
 }

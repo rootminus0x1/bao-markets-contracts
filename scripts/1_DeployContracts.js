@@ -160,6 +160,17 @@ async function main() {
     const setEthPriceTx = await oracleContract.setFeed(CEtherContract.address, mockFeedContract.address, "18");
     await setEthPriceTx.wait();
     console.log("Price Feeds configured");
+ 
+    //Set the ReserveFactor for Synth 
+    const setReserveFactor1Tx = await cERC20ImmunatbleContract._setReserveFactor("500000000000000000");
+    await setReserveFactor1Tx.wait();
+    //Set the ReserveFactor for ETH 
+    const setReserveFactor2Tx = await CEtherContract._setReserveFactor("500000000000000000");
+    await setReserveFactor2Tx.wait();
+    //Set the ReserveFactor for USDC 
+    const setReserveFactor3Tx = await cUSDCImmunatbleContract._setReserveFactor("500000000000000000");
+    await setReserveFactor3Tx.wait();
+    console.log("dbTokens configured");
 
     //Set the oracle for price queries
     const setOracleTx = await comptrollerContract._setPriceOracle(oracleContract.address);
@@ -197,6 +208,9 @@ async function main() {
     //Set the IMFFactor for USDC
     const setIMFFactor3Tx = await comptrollerContract._setIMFFactor(cUSDCImmunatbleContract.address, "40000000000000000");
     await setIMFFactor3Tx.wait();
+    //Set the Maximum amount of borrowed synth tokens 
+    const setBorrowCapTx = await comptrollerContract._setMarketBorrowCaps([cERC20ImmunatbleContract.address],["1000000000000000000000000"]);
+    await setBorrowCapTx.wait();   
     console.log("Comptroller Configured");
 
     //Allow Fed to mint the synths
@@ -221,7 +235,7 @@ async function main() {
     await accrueTx.wait();
     var accrueTx = await CEtherContract.accrueInterest();
     await accrueTx.wait();
-    console.log("Interests accrued");
+    console.log("Interests accrued");   
 
     //Print all addresses
     console.log("----------------------------------------------------------------------------");

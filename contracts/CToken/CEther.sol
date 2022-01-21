@@ -1,4 +1,4 @@
-import { CToken } from "./CToken.sol";
+import "./CToken.sol";
 
 // File: CEther.sol
 pragma solidity ^0.5.16;
@@ -209,5 +209,9 @@ contract CEther is CToken {
      */
     function balanceOfUnderlying(address owner) external view returns (uint) {
         return accountTokens[owner].fmul(exchangeRateCurrent(), 1e18);
+    }
+
+    function _addReserves() external payable returns (uint) {
+        return _addReservesInternal(msg.value);
     }
 }

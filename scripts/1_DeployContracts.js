@@ -4,14 +4,15 @@ const fs = require('fs');
 async function main() {    
     var unitrollerContract;
     var comptrollerContract;
+    var delegateContract;
     var originalcomptrollerAddress;
     var ERC20Contract;
     var USDCERC20Contract;
     var USDCMockFeedContract;
     var JumpRateModelContract;
     var USDCJumpRateModelContract;
-    var cERC20ImmunatbleContract;
-    var cUSDCImmunatbleContract;
+    var cERC20Contract;
+    var cUSDCContract;
     var fedContract;
     var oracleContract;
     var mockFeedContract;
@@ -38,6 +39,10 @@ async function main() {
     await USDCMockFeedContract.deployTransaction.wait();
     console.log("Price Feeds Deployed");
 
+    //Deploy Delegate (cERC20 Implementation)
+    const delegateFactory = await ethers.getContractFactory("CErc20Delegate");
+    delegateContract = await delegateFactory.deploy();
+    await delegateContract.deployTransaction.wait();
     // Deploy Comptroller
     const comptrollerFactory = await ethers.getContractFactory("contracts/Comptroller.sol:Comptroller");
     comptrollerContract = await comptrollerFactory.deploy();
@@ -92,8 +97,8 @@ async function main() {
     console.log("Interest Rates Deployed");
     
     //Deploy bdSynth
-    const cERC20ImmunatbleFactory = await ethers.getContractFactory("contracts/CToken/CErc20.sol:CErc20Immutable");
-    cERC20ImmunatbleContract = await cERC20ImmunatbleFactory.deploy(
+    const cERC20Factory = await ethers.getContractFactory("CErc20Delegator");
+    cERC20Contract = await cERC20Factory.deploy(
         ERC20Contract.address,  //address underlying_
         unitrollerContract.address, //ComptrollerInterface comptroller_
         JumpRateModelContract.address,  //InterestRateModel interestRateModel_
@@ -101,11 +106,13 @@ async function main() {
         "bao deposited bUSD",   //string memory name_
         "bdUSD",   //string memory symbol_
         "8",   //uint8 decimals_
-        (await ethers.getSigners())[0].address //address payable admin_
+        (await ethers.getSigners())[0].address, //address payable admin_
+        delegateContract.address, //address implementation
+        0 //Unused data entry
     );
-    await cERC20ImmunatbleContract.deployTransaction.wait();     
+    await cERC20Contract.deployTransaction.wait();     
     //Deploy bdUSDC
-    cUSDCImmunatbleContract = await cERC20ImmunatbleFactory.deploy(
+    cUSDCContract = await cERC20Factory.deploy(
         USDCERC20Contract.address,  //address underlying_
         unitrollerContract.address, //ComptrollerInterface comptroller_
         USDCJumpRateModelContract.address,  //InterestRateModel interestRateModel_
@@ -113,9 +120,11 @@ async function main() {
         "bao deposited USDC",   //string memory name_
         "bdUSDC",   //string memory symbol_
         "8",   //uint8 decimals_
-        (await ethers.getSigners())[0].address //address payable admin_
+        (await ethers.getSigners())[0].address, //address payable admin_
+        delegateContract.address, //address implementation
+        0 //Unused data entry
     );
-    await cUSDCImmunatbleContract.deployTransaction.wait();
+    await cUSDCContract.deployTransaction.wait();
     //Deploy bdETH
     const CEtherFactory = await ethers.getContractFactory("contracts/CEther.sol:CEther");
     CEtherContract = await CEtherFactory.deploy(
@@ -132,7 +141,7 @@ async function main() {
 
     //Deploy Fed
     const fedFactory = await ethers.getContractFactory("contracts/Fed.sol:Fed");
-    fedContract = await fedFactory.deploy(cERC20ImmunatbleContract.address, (await ethers.getSigners())[0].address); //CErc20 ctoken_, address gov_ 
+    fedContract = await fedFactory.deploy(cERC20Contract.address, (await ethers.getSigners())[0].address); //CErc20 ctoken_, address gov_ 
     await fedContract.deployTransaction.wait();
     console.log("Fed Deployed");
 
@@ -151,10 +160,10 @@ async function main() {
     setDecimalesTx = await USDCMockFeedContract.setDecimals(8);
     await setDecimalesTx.wait(); 
     //Set USDC erc20 price feed
-    const setUSDCPriceTx = await oracleContract.setFeed(cUSDCImmunatbleContract.address, USDCMockFeedContract.address, "6");
+    const setUSDCPriceTx = await oracleContract.setFeed(cUSDCContract.address, USDCMockFeedContract.address, "6");
     await setUSDCPriceTx.wait();
     //Set fixed 1USD price feed for Synth
-    setSynthPriceTx = await oracleContract.setFixedPrice(cERC20ImmunatbleContract.address, "1000000000000000000");
+    setSynthPriceTx = await oracleContract.setFixedPrice(cERC20Contract.address, "1000000000000000000");
     await setSynthPriceTx.wait();
     //Set Ethereum price feed
     const setEthPriceTx = await oracleContract.setFeed(CEtherContract.address, mockFeedContract.address, "18");
@@ -162,13 +171,13 @@ async function main() {
     console.log("Price Feeds configured");
  
     //Set the ReserveFactor for Synth 
-    const setReserveFactor1Tx = await cERC20ImmunatbleContract._setReserveFactor("500000000000000000");
+    const setReserveFactor1Tx = await cERC20Contract._setReserveFactor("500000000000000000");
     await setReserveFactor1Tx.wait();
     //Set the ReserveFactor for ETH 
     const setReserveFactor2Tx = await CEtherContract._setReserveFactor("500000000000000000");
     await setReserveFactor2Tx.wait();
     //Set the ReserveFactor for USDC 
-    const setReserveFactor3Tx = await cUSDCImmunatbleContract._setReserveFactor("500000000000000000");
+    const setReserveFactor3Tx = await cUSDCContract._setReserveFactor("500000000000000000");
     await setReserveFactor3Tx.wait();
     console.log("dbTokens configured");
 
@@ -182,34 +191,34 @@ async function main() {
     const setLiquidationIncentiveTx = await comptrollerContract._setLiquidationIncentive("1100000000000000000");
     await setLiquidationIncentiveTx.wait();
     //Create Synth Market
-    const setERC20MarketTx = await comptrollerContract._supportMarket(cERC20ImmunatbleContract.address);
+    const setERC20MarketTx = await comptrollerContract._supportMarket(cERC20Contract.address);
     await setERC20MarketTx.wait();
     //Create ETH Market
     const setEthMarketTx = await comptrollerContract._supportMarket(CEtherContract.address);
     await setEthMarketTx.wait();
     //Create USDC Market
-    const setUSDCMarketTx = await comptrollerContract._supportMarket(cUSDCImmunatbleContract.address);
+    const setUSDCMarketTx = await comptrollerContract._supportMarket(cUSDCContract.address);
     await setUSDCMarketTx.wait();
     //Set the CollateralFactor for Synth
-    const setCollateralFactor1Tx = await comptrollerContract._setCollateralFactor(cERC20ImmunatbleContract.address, "750000000000000000");
+    const setCollateralFactor1Tx = await comptrollerContract._setCollateralFactor(cERC20Contract.address, "750000000000000000");
     await setCollateralFactor1Tx.wait();
     //Set the CollateralFactor for Eth
     const setCollateralFactor2Tx = await comptrollerContract._setCollateralFactor(CEtherContract.address, "750000000000000000");
     await setCollateralFactor2Tx.wait();
     //Set the CollateralFactor for USDC
-    const setCollateralFactor3Tx = await comptrollerContract._setCollateralFactor(cUSDCImmunatbleContract.address, "750000000000000000");
+    const setCollateralFactor3Tx = await comptrollerContract._setCollateralFactor(cUSDCContract.address, "750000000000000000");
     await setCollateralFactor3Tx.wait();
     //Set the IMFFactor for Synth
-    const setIMFFactor1Tx = await comptrollerContract._setIMFFactor(cERC20ImmunatbleContract.address, "40000000000000000");
+    const setIMFFactor1Tx = await comptrollerContract._setIMFFactor(cERC20Contract.address, "40000000000000000");
     await setIMFFactor1Tx.wait();
     //Set the IMFFactor for ETH
     const setIMFFactor2Tx = await comptrollerContract._setIMFFactor(CEtherContract.address, "40000000000000000");
     await setIMFFactor2Tx.wait();
     //Set the IMFFactor for USDC
-    const setIMFFactor3Tx = await comptrollerContract._setIMFFactor(cUSDCImmunatbleContract.address, "40000000000000000");
+    const setIMFFactor3Tx = await comptrollerContract._setIMFFactor(cUSDCContract.address, "40000000000000000");
     await setIMFFactor3Tx.wait();
     //Set the Maximum amount of borrowed synth tokens 
-    const setBorrowCapTx = await comptrollerContract._setMarketBorrowCaps([cERC20ImmunatbleContract.address],["1000000000000000000000000"]);
+    const setBorrowCapTx = await comptrollerContract._setMarketBorrowCaps([cERC20Contract.address],["1000000000000000000000000"]);
     await setBorrowCapTx.wait();   
     console.log("Comptroller Configured");
 
@@ -229,9 +238,9 @@ async function main() {
     console.log("Fed Expanded");
 
     //In order for the subgraph to work we accrue interest once for every bdToken
-    var accrueTx = await cERC20ImmunatbleContract.accrueInterest();
+    var accrueTx = await cERC20Contract.accrueInterest();
     await accrueTx.wait();
-    var accrueTx = await cUSDCImmunatbleContract.accrueInterest();
+    var accrueTx = await cUSDCContract.accrueInterest();
     await accrueTx.wait();
     var accrueTx = await CEtherContract.accrueInterest();
     await accrueTx.wait();
@@ -244,19 +253,20 @@ async function main() {
     console.log("Comptroller:       " + originalcomptrollerAddress);
     console.log("Unitroller:        " + unitrollerContract.address);
     console.log("Oracle:             " + oracleContract.address);
+    console.log("Implementation     " + delegateContract.address);
     console.log("Fed:               " + fedContract.address);
     console.log("bUSD:              " + ERC20Contract.address);
     console.log("bUSD interestrate model: " + JumpRateModelContract.address);
-    console.log("bdUSD:  " + cERC20ImmunatbleContract.address);
+    console.log("bdUSD:  " + cERC20Contract.address);
     console.log("Eth interest rate model:  " + WhitePaperModelContract.address);
     console.log("bdETH:            " + CEtherContract.address);
     console.log("USDC ERC20:  " + USDCERC20Contract.address);
     console.log("USDC interest rate model:  " + USDCJumpRateModelContract.address);
-    console.log("bdUSDC:            " + cUSDCImmunatbleContract.address);
+    console.log("bdUSDC:            " + cUSDCContract.address);
     console.log("----------------------------------------------------------------------------");
     console.log("----------------------------------------------------------------------------");
     //Save Addresses to txt File for tests
-    const content = originalcomptrollerAddress + "," + unitrollerContract.address + "," + oracleContract.address + "," + ERC20Contract.address + "," + JumpRateModelContract.address + "," + cERC20ImmunatbleContract.address + "," + fedContract.address + "," + WhitePaperModelContract.address + "," + CEtherContract.address + "," + mockFeedContract.address + "," + USDCERC20Contract.address + "," + USDCJumpRateModelContract.address + "," + cUSDCImmunatbleContract.address + "," + USDCMockFeedContract.address
+    const content = originalcomptrollerAddress + "," + unitrollerContract.address + "," + oracleContract.address + "," + ERC20Contract.address + "," + JumpRateModelContract.address + "," + cERC20Contract.address + "," + fedContract.address + "," + WhitePaperModelContract.address + "," + CEtherContract.address + "," + mockFeedContract.address + "," + USDCERC20Contract.address + "," + USDCJumpRateModelContract.address + "," + cUSDCContract.address + "," + USDCMockFeedContract.address
     fs.writeFileSync('./deployedContracts.txt', content, err => {
         if (err) {
             console.error(err)

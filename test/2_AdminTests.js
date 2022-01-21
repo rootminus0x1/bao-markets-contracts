@@ -5,7 +5,7 @@ const fs = require('fs');
 var unitrollerContract;
 var comptrollerContract;
 var ERC20Contract;
-var cERC20ImmunatbleContract;
+var cERC20Contract;
 var CEtherContract;
 
 var admin;
@@ -31,7 +31,7 @@ describe("Admin Tests", function () {
         oracleContract = await ethers.getContractAt("contracts/Oracle.sol:Oracle",addressArr[2]);
         ERC20Contract = await ethers.getContractAt("contracts/Fed.sol:ERC20",addressArr[3]);
         JumpRateModelContract = await ethers.getContractAt("contracts/JumpRateModelV2.sol:JumpRateModelV2",addressArr[4]);
-        cERC20ImmunatbleContract = await ethers.getContractAt("contracts/CToken/CErc20.sol:CErc20Immutable",addressArr[5]);
+        cERC20Contract = await ethers.getContractAt("CErc20Delegator",addressArr[5]);
         fedContract = await ethers.getContractAt("contracts/Fed.sol:Fed",addressArr[6]);
         WhitePaperModelContract = await ethers.getContractAt("contracts/WhitePaperInterestRateModel.sol:WhitePaperInterestRateModel", addressArr[7]);
         CEtherContract = await ethers.getContractAt("contracts/CEther.sol:CEther",addressArr[8]);
@@ -54,32 +54,32 @@ describe("Admin Tests", function () {
         await setUserBalances();
 
         //Enter the existing markets
-        var enterMarketTx = await comptrollerContract.connect(admin).enterMarkets([CEtherContract.address, cERC20ImmunatbleContract.address]);
+        var enterMarketTx = await comptrollerContract.connect(admin).enterMarkets([CEtherContract.address, cERC20Contract.address]);
         await enterMarketTx.wait();
 
         //Enter the existing markets
-        enterMarketTx = await comptrollerContract.connect(randomUser).enterMarkets([CEtherContract.address, cERC20ImmunatbleContract.address]);
+        enterMarketTx = await comptrollerContract.connect(randomUser).enterMarkets([CEtherContract.address, cERC20Contract.address]);
         await enterMarketTx.wait();
     });
  
     it('Setting new Admin', async () => {
         //Non-admin shouldn't be able to set pending admin
-        await cERC20ImmunatbleContract.connect(randomUser)._setPendingAdmin(randomUser.address);
-        expect(await cERC20ImmunatbleContract.pendingAdmin()).to.equal(await address(0));
+        await cERC20Contract.connect(randomUser)._setPendingAdmin(randomUser.address);
+        expect(await cERC20Contract.pendingAdmin()).to.equal(await address(0));
 
         // Setting the pending admin
-        await cERC20ImmunatbleContract.connect(admin)._setPendingAdmin(randomUser.address);
-        await cERC20ImmunatbleContract.connect(admin)._setPendingAdmin(admin.address);
-        expect(await cERC20ImmunatbleContract.pendingAdmin()).to.equal(admin.address);
+        await cERC20Contract.connect(admin)._setPendingAdmin(randomUser.address);
+        await cERC20Contract.connect(admin)._setPendingAdmin(admin.address);
+        expect(await cERC20Contract.pendingAdmin()).to.equal(admin.address);
 
         // We expect randomUser not to be able to gain the admin role
-        await cERC20ImmunatbleContract.connect(randomUser)._acceptAdmin();
-        expect(await cERC20ImmunatbleContract.pendingAdmin()).to.equal(admin.address);
+        await cERC20Contract.connect(randomUser)._acceptAdmin();
+        expect(await cERC20Contract.pendingAdmin()).to.equal(admin.address);
 
         //Pending admin accepts and becomes admin
-        await cERC20ImmunatbleContract.connect(admin)._acceptAdmin();
-        expect(await cERC20ImmunatbleContract.pendingAdmin()).to.equal(await address(0));
-        expect(await cERC20ImmunatbleContract.admin()).to.equal(admin.address);     
+        await cERC20Contract.connect(admin)._acceptAdmin();
+        expect(await cERC20Contract.pendingAdmin()).to.equal(await address(0));
+        expect(await cERC20Contract.admin()).to.equal(admin.address);     
     });
 
     it('Setting new Comptroller', async () => {
@@ -87,17 +87,17 @@ describe("Admin Tests", function () {
         var newComptroller = (await ethers.getSigners())[10];
 
         //We expect that random user cannot change comptroller address
-        await cERC20ImmunatbleContract.connect(randomUser)._setComptroller(newComptroller.address);
-        expect(await cERC20ImmunatbleContract.comptroller()).to.equal(unitrollerContract.address);
+        await cERC20Contract.connect(randomUser)._setComptroller(newComptroller.address);
+        expect(await cERC20Contract.comptroller()).to.equal(unitrollerContract.address);
 
         // Non Controller address should be reverted
-        await expect(cERC20ImmunatbleContract.connect(admin)._setComptroller(newComptroller.address)).to.be.reverted;
-        expect(await cERC20ImmunatbleContract.comptroller()).to.equal(unitrollerContract.address);
+        await expect(cERC20Contract.connect(admin)._setComptroller(newComptroller.address)).to.be.reverted;
+        expect(await cERC20Contract.comptroller()).to.equal(unitrollerContract.address);
 
         //Address of a real comptroller contract should work
         newComptroller = comptrollerContract;
-        await cERC20ImmunatbleContract.connect(admin)._setComptroller(newComptroller.address);
-        expect(await cERC20ImmunatbleContract.comptroller()).to.equal(newComptroller.address);
+        await cERC20Contract.connect(admin)._setComptroller(newComptroller.address);
+        expect(await cERC20Contract.comptroller()).to.equal(newComptroller.address);
     });
 
     it('Pausing Minting', async () => {
@@ -130,77 +130,77 @@ describe("Admin Tests", function () {
         await mintTx.wait();
         
         //get original borrowed amount from the user
-        originalBorrowBalance = await cERC20ImmunatbleContract.connect(randomUser).borrowBalanceStored(randomUser.address);
+        originalBorrowBalance = await cERC20Contract.connect(randomUser).borrowBalanceStored(randomUser.address);
 
         //Borrow any amount 
-        borrowTx = await cERC20ImmunatbleContract.connect(randomUser).borrow("100000");
+        borrowTx = await cERC20Contract.connect(randomUser).borrow("100000");
         await borrowTx.wait();
 
         //Expect that user could not borrow any assets, as they are not whitelisted
-        expect(originalBorrowBalance).to.equal((await cERC20ImmunatbleContract.connect(randomUser).borrowBalanceStored(randomUser.address))); 
+        expect(originalBorrowBalance).to.equal((await cERC20Contract.connect(randomUser).borrowBalanceStored(randomUser.address))); 
         
         // Admin adds user to whitelist
         whitelistTx = await comptrollerContract.connect(admin)._addToWhitelist([randomUser.address], [true]);
         await whitelistTx.wait();
 
         //get original borrowed amount from the user
-        originalBorrowBalance = await cERC20ImmunatbleContract.connect(randomUser).borrowBalanceStored(randomUser.address);
+        originalBorrowBalance = await cERC20Contract.connect(randomUser).borrowBalanceStored(randomUser.address);
 
         //Borrow any amount 
-        borrowTx = await cERC20ImmunatbleContract.connect(randomUser).borrow("100000");
+        borrowTx = await cERC20Contract.connect(randomUser).borrow("100000");
         await borrowTx.wait();
 
         //Expect whitelisted user to be able to borrow assets
-        expect(originalBorrowBalance.add(ethers.BigNumber.from("100000"))).to.equal((await cERC20ImmunatbleContract.connect(randomUser).borrowBalanceStored(randomUser.address)));  
+        expect(originalBorrowBalance.add(ethers.BigNumber.from("100000"))).to.equal((await cERC20Contract.connect(randomUser).borrowBalanceStored(randomUser.address)));  
         
         //get original borrowed amount from the admin
-        originalBorrowBalance = await cERC20ImmunatbleContract.connect(admin).borrowBalanceStored(admin.address);
+        originalBorrowBalance = await cERC20Contract.connect(admin).borrowBalanceStored(admin.address);
 
         //Borrow any amount 
-        borrowTx = await cERC20ImmunatbleContract.connect(admin).borrow("100000");
+        borrowTx = await cERC20Contract.connect(admin).borrow("100000");
         await borrowTx.wait();
 
         //Expect that admin could not borrow any assets, as they are not whitelisted
-        expect(originalBorrowBalance).to.equal((await cERC20ImmunatbleContract.connect(admin).borrowBalanceStored(admin.address))); 
+        expect(originalBorrowBalance).to.equal((await cERC20Contract.connect(admin).borrowBalanceStored(admin.address))); 
 
         //We remove asset from whitelist modus
-        const removeWhitelistModusTx = await comptrollerContract.connect(admin)._setBorrowRestriction([cERC20ImmunatbleContract.address],[false]);
+        const removeWhitelistModusTx = await comptrollerContract.connect(admin)._setBorrowRestriction([cERC20Contract.address],[false]);
         await removeWhitelistModusTx.wait();
 
         //Admin should be able to borrow now
         //get original borrowed amount from the admin
-        originalBorrowBalance = await cERC20ImmunatbleContract.connect(admin).borrowBalanceStored(admin.address);
+        originalBorrowBalance = await cERC20Contract.connect(admin).borrowBalanceStored(admin.address);
 
         //Borrow any amount 
-        borrowTx = await cERC20ImmunatbleContract.connect(admin).borrow("100000");
+        borrowTx = await cERC20Contract.connect(admin).borrow("100000");
         await borrowTx.wait();
 
         //Expect admin to be able to borrow assets
-        expect(originalBorrowBalance.add(ethers.BigNumber.from("100000"))).to.equal((await cERC20ImmunatbleContract.connect(admin).borrowBalanceStored(admin.address))); 
+        expect(originalBorrowBalance.add(ethers.BigNumber.from("100000"))).to.equal((await cERC20Contract.connect(admin).borrowBalanceStored(admin.address))); 
         
     });
 
     it('Pausing Borrowing', async () => {
         // Admin pauses borrowing
-        var pausingTx = await comptrollerContract.connect(admin)._setBorrowPaused(cERC20ImmunatbleContract.address, true);
+        var pausingTx = await comptrollerContract.connect(admin)._setBorrowPaused(cERC20Contract.address, true);
         await pausingTx.wait();
 
         // No one can borrow the paused asset
-        await expect(cERC20ImmunatbleContract.connect(admin).borrow("100000")).to.be.reverted;
+        await expect(cERC20Contract.connect(admin).borrow("100000")).to.be.reverted;
 
         // Admin un-pauses borrowing
-        pausingTx = await comptrollerContract.connect(admin)._setBorrowPaused(cERC20ImmunatbleContract.address, false);
+        pausingTx = await comptrollerContract.connect(admin)._setBorrowPaused(cERC20Contract.address, false);
         await pausingTx.wait();
 
         //get original borrowed amount from the user
-        const originalBorrowBalance = await cERC20ImmunatbleContract.connect(admin).borrowBalanceStored(admin.address);
+        const originalBorrowBalance = await cERC20Contract.connect(admin).borrowBalanceStored(admin.address);
 
         //Borrow any amount 
-        const borrowTx = await cERC20ImmunatbleContract.connect(admin).borrow("100000");
+        const borrowTx = await cERC20Contract.connect(admin).borrow("100000");
         await borrowTx.wait();
 
         //Check that borrow works again
-        expect(originalBorrowBalance.add(ethers.BigNumber.from("100000"))).to.equal((await cERC20ImmunatbleContract.connect(admin).borrowBalanceStored(admin.address)));        
+        expect(originalBorrowBalance.add(ethers.BigNumber.from("100000"))).to.equal((await cERC20Contract.connect(admin).borrowBalanceStored(admin.address)));        
     });
 
     //Create a 0 address

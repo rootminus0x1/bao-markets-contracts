@@ -1,4 +1,4 @@
-import "./CToken.sol";
+import { CToken } from "./CToken.sol";
 
 // File: CEther.sol
 pragma solidity ^0.5.16;
@@ -166,5 +166,48 @@ contract CEther is CToken {
         fullMessage[i+4] = byte(uint8(41));
 
         require(errCode == uint(Error.NO_ERROR), string(fullMessage));
+    }
+
+    /**
+     * @author Modified from transmissions11 (https://github.com/transmissions11/libcompound/blob/main/src/LibCompound.sol)
+     * @return Calculated exchange rate scaled by 1e18
+     */
+    function exchangeRateCurrent() public view returns (uint) {
+
+        uint256 accrualBlockNumberPrior = accrualBlockNumber;
+
+        if (accrualBlockNumberPrior == block.number) return exchangeRateStored();
+
+        uint256 totalCash = address(this).balance;
+        uint256 borrowsPrior = totalBorrows;
+        uint256 reservesPrior = totalReserves;
+
+        uint256 borrowRateMantissa = interestRateModel.getBorrowRate(totalCash, borrowsPrior, reservesPrior);
+
+        require(borrowRateMantissa <= 0.0005e16, "RATE_TOO_HIGH");
+
+        uint256 interestAccumulated = (borrowRateMantissa * (block.number - accrualBlockNumberPrior)).fmul(
+            borrowsPrior,
+            1e18
+        );
+
+        uint256 currentTotalReserves = reserveFactorMantissa.fmul(interestAccumulated, 1e18) + reservesPrior;
+        uint256 currentNewTotalBorrows = interestAccumulated + borrowsPrior;
+        uint256 currentTotalSupply = totalSupply;
+
+        return
+            totalSupply == 0
+                ? initialExchangeRateMantissa
+                : (totalCash + currentNewTotalBorrows - currentTotalReserves).fdiv(currentTotalSupply, 1e18);
+    }
+
+    /**
+     * @notice Get the underlying balance of the `owner`
+     * @author Modified from transmissions11 (https://github.com/transmissions11/libcompound/blob/main/src/LibCompound.sol)
+     * @param owner The address of the account to query
+     * @return The amount of underlying owned by `owner`
+     */
+    function balanceOfUnderlying(address owner) external view returns (uint) {
+        return accountTokens[owner].fmul(exchangeRateCurrent(), 1e18);
     }
 }

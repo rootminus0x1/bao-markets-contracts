@@ -543,7 +543,7 @@ contract Comptroller is ComptrollerV5Storage, ComptrollerInterface, ComptrollerE
 
         if (borrowRestricted[cToken]) {
             if (!borrowWhitelist[borrower]){
-                return uint(Error.UNAUTHORIZED);
+                revert("Borrower is not whitelisted");
             }
         }
 

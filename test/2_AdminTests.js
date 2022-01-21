@@ -180,7 +180,7 @@ describe("Admin Tests", function () {
         
     });
 
-    /*it('Pausing Borrowing', async () => {
+    it('Pausing Borrowing', async () => {
         // Admin pauses borrowing
         var pausingTx = await comptrollerContract.connect(admin)._setBorrowPaused(cERC20ImmunatbleContract.address, true);
         await pausingTx.wait();
@@ -201,7 +201,7 @@ describe("Admin Tests", function () {
 
         //Check that borrow works again
         expect(originalBorrowBalance.add(ethers.BigNumber.from("100000"))).to.equal((await cERC20ImmunatbleContract.connect(admin).borrowBalanceStored(admin.address)));        
-    });*/
+    });
 
     //Create a 0 address
     const address = async (n) => {

@@ -879,42 +879,6 @@ contract CErc20Interface is CErc20Storage {
     function _addReserves(uint addAmount) external returns (uint);
 }
 
-contract CDelegationStorage {
-    /**
-     * @notice Implementation address for this contract
-     */
-    address public implementation;
-}
-
-contract CDelegatorInterface is CDelegationStorage {
-    /**
-     * @notice Emitted when implementation is changed
-     */
-    event NewImplementation(address oldImplementation, address newImplementation);
-
-    /**
-     * @notice Called by the admin to update the implementation of the delegator
-     * @param implementation_ The address of the new implementation for delegation
-     * @param allowResign Flag to indicate whether to call _resignImplementation on the old implementation
-     * @param becomeImplementationData The encoded bytes data to be passed to _becomeImplementation
-     */
-    function _setImplementation(address implementation_, bool allowResign, bytes memory becomeImplementationData) public;
-}
-
-contract CDelegateInterface is CDelegationStorage {
-    /**
-     * @notice Called by the delegator on a delegate to initialize it for duty
-     * @dev Should revert if any issues arise which make it unfit for delegation
-     * @param data The encoded bytes data for any initialization
-     */
-    function _becomeImplementation(bytes memory data) public;
-
-    /**
-     * @notice Called by the delegator on a delegate to forfeit its responsibility
-     */
-    function _resignImplementation() public;
-}
-
 contract ComptrollerInterface {
     /// @notice Indicator that this is a Comptroller contract (for inspection)
     bool public constant isComptroller = true;

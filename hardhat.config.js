@@ -19,9 +19,9 @@ require("hardhat-gas-reporter");
       //accounts: [""]
     },
     ropsten: {
-      url: "https://ropsten.infura.io/v3/",
+      url: "https://ropsten.infura.io/v3/3929f51780ec46d6903b10b02207c53b",
       //Consider any address posted here to be compromised
-      //accounts: [""]
+      //accounts: ["26f79db75776e49903be1f2f5d44b0ce3167b865b3cfc02c6e7ee3973ce8dc64","26cf0e71eeb12471b708d6cc9f27a864594b73338da439c2e6acf7571eaeeaa7"]
     }
   },
   solidity: {

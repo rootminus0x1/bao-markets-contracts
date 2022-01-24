@@ -42,10 +42,12 @@ contract CErc20 is CToken, CErc20Interface {
      * @return uint 0=success, otherwise a failure (see ErrorReporter.sol for details)
      */
     function mint(uint mintAmount, bool enterMarket) external returns (uint) {
-        (uint err,) = mintInternal(mintAmount, enterMarket);
+        (uint err,) = mintInternal(mintAmount);
         //If the mint was successfull and the user wants to use assets as collateral
         if(err == 0 && enterMarket == true){
-            comptroller.entermarkets([this(address)], msg.sender);
+            address[] memory marketToEnter = new address[](1);
+            marketToEnter[0] = address(this);
+            comptroller.enterMarkets(marketToEnter, msg.sender);
         }
         return err;
     }

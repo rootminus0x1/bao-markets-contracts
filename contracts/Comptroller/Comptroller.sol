@@ -298,9 +298,15 @@ contract Comptroller is ComptrollerV5Storage, ComptrollerInterface, ComptrollerE
      * @return Success indicator for whether each corresponding market was entered
      */
     function enterMarkets(address[] memory cTokens, address borrower) public returns (uint[] memory) {
+        uint len = cTokens.length;
+
+        uint[] memory results = new uint[](len);
         //If Command comes from a verified cToken, then the borrower can be entered into the market
-        if(cTokens[0] == msg.sender && markets[cTokens[0]].isListed{
-            results[0] = addToMarketInternal(cToken, borrower)
+        if(cTokens[0] == msg.sender && markets[cTokens[0]].isListed){
+            require(len == 1);
+            CToken cToken = CToken(cTokens[0]);
+
+            results[0] = uint(addToMarketInternal(cToken, borrower));
         }else{
             uint len = cTokens.length;
 

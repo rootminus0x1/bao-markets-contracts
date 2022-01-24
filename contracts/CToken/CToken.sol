@@ -926,7 +926,7 @@ contract ComptrollerInterface {
 
     /*** Assets You Are In ***/
 
-    function enterMarkets(address[] calldata cTokens) external returns (uint[] memory);
+    function enterMarkets(address[] calldata cTokens, address borrower) external returns (uint[] memory);
     function exitMarket(address cToken) external returns (uint);
 
     /*** Policy Hooks ***/

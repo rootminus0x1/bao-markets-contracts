@@ -78,8 +78,8 @@ contract CErc20Delegator is CTokenInterface, CErc20Interface, CDelegatorInterfac
      * @param mintAmount The amount of the underlying asset to supply
      * @return uint 0=success, otherwise a failure (see ErrorReporter.sol for details)
      */
-    function mint(uint mintAmount) external returns (uint) {
-        bytes memory data = delegateToImplementation(abi.encodeWithSignature("mint(uint256)", mintAmount));
+    function mint(uint mintAmount, bool enterMarket) external returns (uint) {
+        bytes memory data = delegateToImplementation(abi.encodeWithSignature("mint(uint256,bool)", mintAmount, enterMarket));
         return abi.decode(data, (uint));
     }
 

@@ -1,6 +1,6 @@
-pragma solidity ^0.5.16;
-
 import "./CErc20.sol";
+
+pragma solidity ^0.5.16;
 
 /**
  * @title Compound's CErc20Delegate Contract

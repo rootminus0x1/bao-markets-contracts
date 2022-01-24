@@ -24,7 +24,7 @@ async function main() {
     ////////////////////////////////////////
 
     //Deploy Oracle 
-    const oracleFactory = await ethers.getContractFactory("contracts/Oracle.sol:Oracle");
+    const oracleFactory = await ethers.getContractFactory("Oracle");
     oracleContract = await oracleFactory.deploy();
     await oracleContract.deployTransaction.wait();
     console.log("Oracle Deployed");
@@ -44,12 +44,12 @@ async function main() {
     delegateContract = await delegateFactory.deploy();
     await delegateContract.deployTransaction.wait();
     // Deploy Comptroller
-    const comptrollerFactory = await ethers.getContractFactory("contracts/Comptroller.sol:Comptroller");
+    const comptrollerFactory = await ethers.getContractFactory("Comptroller");
     comptrollerContract = await comptrollerFactory.deploy();
     await comptrollerContract.deployTransaction.wait();
     originalcomptrollerAddress = comptrollerContract.address;
     // Deploy Unitroller
-    const unitrollerFactory = await ethers.getContractFactory("contracts/Unitroller.sol:Unitroller");
+    const unitrollerFactory = await ethers.getContractFactory("contracts/Comptroller/Unitroller.sol:Unitroller");
     unitrollerContract = await unitrollerFactory.deploy();
     await unitrollerContract.deployTransaction.wait();
     //Set Implementation for Unitroller
@@ -58,11 +58,11 @@ async function main() {
     const setApproveNewImplementationTx = await comptrollerContract._become(unitrollerContract.address);
     await setApproveNewImplementationTx.wait();
     //We are addressing the Unitroller, which delegates to comptroller
-    comptrollerContract = await ethers.getContractAt("contracts/Comptroller.sol:Comptroller", unitrollerContract.address);
+    comptrollerContract = await ethers.getContractAt("Comptroller", unitrollerContract.address);
     console.log("Comptroller Deployed");
 
     // Deploy synth ERC20 (Underlying token)
-    const ERC20Factory = await ethers.getContractFactory("contracts/Fed.sol:ERC20");
+    const ERC20Factory = await ethers.getContractFactory("ERC20");
     ERC20Contract = await ERC20Factory.deploy("Bao USD","bUSD","18");
     await ERC20Contract.deployTransaction.wait();
     // Deploy USDC ERC20
@@ -72,7 +72,7 @@ async function main() {
 
     // Deploy InterestRateModel
     //For Synth
-    const JumpRateModelFactory = await ethers.getContractFactory("contracts/JumpRateModelV2.sol:JumpRateModelV2");
+    const JumpRateModelFactory = await ethers.getContractFactory("JumpRateModelV2");
     JumpRateModelContract = await JumpRateModelFactory.deploy(
         "0", //uint baseRatePerYear
         "39999999999981600", //uint multiplierPerYear
@@ -91,7 +91,7 @@ async function main() {
     );
     await USDCJumpRateModelContract.deployTransaction.wait(); 
     // For ETH
-    const WhitePaperModelFactory = await ethers.getContractFactory("contracts/WhitePaperInterestRateModel.sol:WhitePaperInterestRateModel");
+    const WhitePaperModelFactory = await ethers.getContractFactory("WhitePaperInterestRateModel");
     WhitePaperModelContract = await WhitePaperModelFactory.deploy("0","39999999999981600");
     await WhitePaperModelContract.deployTransaction.wait(); 
     console.log("Interest Rates Deployed");
@@ -126,7 +126,7 @@ async function main() {
     );
     await cUSDCContract.deployTransaction.wait();
     //Deploy bdETH
-    const CEtherFactory = await ethers.getContractFactory("contracts/CEther.sol:CEther");
+    const CEtherFactory = await ethers.getContractFactory("CEther");
     CEtherContract = await CEtherFactory.deploy(
         unitrollerContract.address, //ComptrollerInterface comptroller_
         WhitePaperModelContract.address,  //InterestRateModel interestRateModel_
@@ -140,7 +140,7 @@ async function main() {
     console.log("bdTokens Deployed");
 
     //Deploy Fed
-    const fedFactory = await ethers.getContractFactory("contracts/Fed.sol:Fed");
+    const fedFactory = await ethers.getContractFactory("Fed");
     fedContract = await fedFactory.deploy(cERC20Contract.address, (await ethers.getSigners())[0].address); //CErc20 ctoken_, address gov_ 
     await fedContract.deployTransaction.wait();
     console.log("Fed Deployed");
@@ -169,17 +169,6 @@ async function main() {
     const setEthPriceTx = await oracleContract.setFeed(CEtherContract.address, mockFeedContract.address, "18");
     await setEthPriceTx.wait();
     console.log("Price Feeds configured");
- 
-    //Set the ReserveFactor for Synth 
-    const setReserveFactor1Tx = await cERC20Contract._setReserveFactor("500000000000000000");
-    await setReserveFactor1Tx.wait();
-    //Set the ReserveFactor for ETH 
-    const setReserveFactor2Tx = await CEtherContract._setReserveFactor("500000000000000000");
-    await setReserveFactor2Tx.wait();
-    //Set the ReserveFactor for USDC 
-    const setReserveFactor3Tx = await cUSDCContract._setReserveFactor("500000000000000000");
-    await setReserveFactor3Tx.wait();
-    console.log("dbTokens configured");
 
     //Set the oracle for price queries
     const setOracleTx = await comptrollerContract._setPriceOracle(oracleContract.address);
@@ -221,6 +210,17 @@ async function main() {
     const setBorrowCapTx = await comptrollerContract._setMarketBorrowCaps([cERC20Contract.address],["1000000000000000000000000"]);
     await setBorrowCapTx.wait();   
     console.log("Comptroller Configured");
+
+    //Set the ReserveFactor for Synth 
+    const setReserveFactor1Tx = await cERC20Contract._setReserveFactor("500000000000000000");
+    await setReserveFactor1Tx.wait();
+    //Set the ReserveFactor for ETH 
+    const setReserveFactor2Tx = await CEtherContract._setReserveFactor("500000000000000000");
+    await setReserveFactor2Tx.wait();
+    //Set the ReserveFactor for USDC 
+    const setReserveFactor3Tx = await cUSDCContract._setReserveFactor("500000000000000000");
+    await setReserveFactor3Tx.wait();
+    console.log("dbTokens configured");
 
     //Allow Fed to mint the synths
     var addMinterTx = await ERC20Contract.addMinter(fedContract.address);

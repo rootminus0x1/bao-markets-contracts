@@ -42,7 +42,7 @@ contract Fed {
     function expansion(uint amount) public {
         require(msg.sender == chair, "ONLY CHAIR");
         underlying.mint(address(this), amount);
-        require(ctoken.mint(amount) == 0, 'Supplying failed');
+        require(ctoken.mint(amount, false) == 0, 'Supplying failed');
         supply = supply.add(amount);
         emit Expansion(amount);
     }

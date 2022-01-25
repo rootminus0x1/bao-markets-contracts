@@ -212,8 +212,8 @@ contract CErc20Delegator is CTokenInterface, CErc20Interface, CDelegatorInterfac
      * @param owner The address of the account to query
      * @return The amount of underlying owned by `owner`
      */
-    function balanceOfUnderlying(address owner) external returns (uint) {
-        bytes memory data = delegateToImplementation(abi.encodeWithSignature("balanceOfUnderlying(address)", owner));
+    function balanceOfUnderlying(address owner) external view returns (uint) {
+        bytes memory data = delegateToViewImplementation(abi.encodeWithSignature("balanceOfUnderlying(address)", owner));
         return abi.decode(data, (uint));
     }
 
@@ -279,8 +279,8 @@ contract CErc20Delegator is CTokenInterface, CErc20Interface, CDelegatorInterfac
      * @notice Accrue interest then return the up-to-date exchange rate
      * @return Calculated exchange rate scaled by 1e18
      */
-    function exchangeRateCurrent() public returns (uint) {
-        bytes memory data = delegateToImplementation(abi.encodeWithSignature("exchangeRateCurrent()"));
+    function exchangeRateCurrent() public view returns (uint) {
+        bytes memory data = delegateToViewImplementation(abi.encodeWithSignature("exchangeRateCurrent()"));
         return abi.decode(data, (uint));
     }
 

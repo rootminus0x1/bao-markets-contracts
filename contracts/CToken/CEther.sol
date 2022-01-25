@@ -43,9 +43,15 @@ contract CEther is CToken {
      * @notice Sender supplies assets into the market and receives cTokens in exchange
      * @dev Reverts upon any failure
      */
-    function mint() external payable {
+    function mint(bool enterMarket) external payable {
         (uint err,) = mintInternal(msg.value);
         requireNoError(err, "mint failed");
+        //If the user wants to use assets as collateral, enter them into the relevant market
+        if(enterMarket == true){
+            address[] memory marketToEnter = new address[](1);
+            marketToEnter[0] = address(this);
+            comptroller.enterMarkets(marketToEnter, msg.sender);
+        }
     }
 
     /**

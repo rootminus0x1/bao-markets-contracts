@@ -3,7 +3,8 @@
   "dependencies": {
     "bignumber": "^1.1.0",
     "fs": "0.0.1-security",
-    "hardhat": "^2.6.5"
+    "hardhat": "^2.6.5",
+    "npm-force-resolutions": "^0.0.10"
   },
   "devDependencies": {
     "@nomiclabs/hardhat-ethers": "^2.0.3",

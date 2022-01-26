@@ -34,7 +34,7 @@ contract Unitroller is UnitrollerAdminStorage, ComptrollerErrorReporter {
 
     constructor() public {
         // Set admin to caller
-        admin = msg.sender;
+        admin = tx.origin;
     }
 
     /*** Admin Functions ***/

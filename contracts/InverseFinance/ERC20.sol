@@ -36,7 +36,7 @@ contract ERC20 {
         name = name_;
         symbol = symbol_;
         decimals = decimals_;
-        operator = msg.sender;
+        operator = tx.origin;
         uint chainId;
         assembly {
             chainId := chainid

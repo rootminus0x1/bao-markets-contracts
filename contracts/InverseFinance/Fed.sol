@@ -20,7 +20,7 @@ contract Fed {
         ctoken = ctoken_;
         underlying = ERC20(ctoken_.underlying());
         underlying.approve(address(ctoken), uint(-1));
-        chair = msg.sender;
+        chair = tx.origin;
         gov = gov_;
     }
 

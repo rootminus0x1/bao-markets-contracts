@@ -32,7 +32,7 @@ contract CErc20Delegator is CTokenInterface, CErc20Interface, CDelegatorInterfac
                 address implementation_,
                 bytes memory becomeImplementationData) public {
         // Creator of the contract is admin during initialization
-        admin = msg.sender;
+        admin = tx.origin;
 
         // First delegate gets to initialize the delegator (i.e. storage contract)
         delegateTo(implementation_, abi.encodeWithSignature("initialize(address,address,address,uint256,string,string,uint8)",

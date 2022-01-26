@@ -38,7 +38,7 @@ contract Oracle is PriceOracle {
     }
 
     constructor() public {
-        owner = msg.sender;
+        owner = tx.origin;
     }
 
     function changeOwner(address owner_) public onlyOwner {

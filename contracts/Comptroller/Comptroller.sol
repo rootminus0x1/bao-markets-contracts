@@ -246,7 +246,7 @@ contract Comptroller is ComptrollerV5Storage, ComptrollerInterface, ComptrollerE
     mapping(address => bool) public borrowWhitelist;
 
     constructor() public {
-        admin = msg.sender;
+        admin = tx.origin;
     }
 
     function sqrt(uint y) internal pure returns (uint z) {

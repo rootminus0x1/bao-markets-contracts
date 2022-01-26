@@ -35,7 +35,7 @@ contract Stabilizer {
         governance = gov_;
         buyFee = buyFee_;
         sellFee = sellFee_;
-        operator = msg.sender;
+        operator = tx.origin;
         supplyCap = supplyCap_;
     }
 

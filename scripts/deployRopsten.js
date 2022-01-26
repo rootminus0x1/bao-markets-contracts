@@ -1,5 +1,4 @@
 const {ethers} = require('hardhat');
-const fs = require('fs');
 
 const main = async () => {
   let unitrollerContract, comptrollerContract, delegateContract, originalcomptrollerAddress, ERC20Contract,
@@ -63,24 +62,24 @@ const main = async () => {
   const JumpRateModelFactory = await ethers.getContractFactory('JumpRateModelV2');
   JumpRateModelContract = await JumpRateModelFactory.deploy(
     '0', // uint baseRatePerYear
-    '39999999999981600', // uint multiplierPerYear
-    '1499999999998520000', // uint jumpMultiplierPerYear
-    '750000000000000000', // uint kink_
+    '49999999998268800', //uint multiplierPerYear
+    '1089999999998841600', //uint jumpMultiplierPerYear
+    '800000000000000000', //uint kink_
     (await ethers.getSigners())[0].address // address owner_
   );
   await JumpRateModelContract.deployTransaction.wait();
   // For USDC
   USDCJumpRateModelContract = await JumpRateModelFactory.deploy(
     '0', // uint baseRatePerYear
-    '39999999999981600', // uint multiplierPerYear
-    '1499999999998520000', // uint jumpMultiplierPerYear
-    '750000000000000000', // uint kink_
+    '49999999998268800', //uint multiplierPerYear
+    '1089999999998841600', //uint jumpMultiplierPerYear
+    '800000000000000000', //uint kink_
     (await ethers.getSigners())[0].address // address owner_
   );
   await USDCJumpRateModelContract.deployTransaction.wait();
   // For ETH
   const WhitePaperModelFactory = await ethers.getContractFactory('WhitePaperInterestRateModel');
-  WhitePaperModelContract = await WhitePaperModelFactory.deploy('0', '39999999999981600');
+  WhitePaperModelContract = await WhitePaperModelFactory.deploy('19999999999728000','99999999998640000');
   await WhitePaperModelContract.deployTransaction.wait();
   console.log('Interest Rates Deployed');
 
@@ -138,8 +137,8 @@ const main = async () => {
     ERC20Contract.address, // bUSD address
     '0xf80A32A835F79D7787E8a8ee5721D0fEaFd78108', // DAI (ROPSTEN ONLY)
     '0xc189ca9c9168004b3c0eed5409c15a88b87a0702', // governance (ROPSTEN ONLY)
-    40, // 0.4% buy fee
-    40, // 0.4% sell fee
+    100, // 1% buy fee
+    100, // 1% sell fee
     '1500000000000000000000000'
   );
   await stabilizerContract.deployTransaction.wait();

@@ -734,7 +734,7 @@ contract CTokenStorage {
     /**
      * @notice Share of seized collateral that is added to reserves
      */
-    uint internal constant protocolSeizeShareMantissa = 2.8e16; //2.8%
+    uint public protocolSeizeShareMantissa = 2.8e16; //2.8%
 }
 
 contract CTokenInterface is CTokenStorage {
@@ -805,6 +805,11 @@ contract CTokenInterface is CTokenStorage {
     event NewReserveFactor(uint oldReserveFactorMantissa, uint newReserveFactorMantissa);
 
     /**
+     * @notice Event emitted when the protocol seize share is changed
+     */
+    event NewProtocolSeizeShare(uint oldProtocolSeizeShareMantissa, uint newProtocolSeizeShareMantissa);
+
+    /**
      * @notice Event emitted when the reserves are added
      */
     event ReservesAdded(address benefactor, uint addAmount, uint newTotalReserves);
@@ -857,6 +862,7 @@ contract CTokenInterface is CTokenStorage {
     function _setReserveFactor(uint newReserveFactorMantissa) external returns (uint);
     function _reduceReserves(uint reduceAmount) external returns (uint);
     function _setInterestRateModel(InterestRateModel newInterestRateModel) public returns (uint);
+    function _setProtocolSeizeShare(uint newProtocolSeizeShareMantissa) external returns (uint);
 }
 
 contract CErc20Storage {
@@ -2039,7 +2045,7 @@ contract CToken is CTokenInterface, Exponential, TokenErrorReporter {
         if (vars.mathErr != MathError.NO_ERROR) {
             return failOpaque(Error.MATH_ERROR, FailureInfo.LIQUIDATE_SEIZE_BALANCE_DECREMENT_FAILED, uint(vars.mathErr));
         }
-        //The protocol receives a share of the seized tokens
+
         vars.protocolSeizeTokens = mul_(seizeTokens, Exp({mantissa: protocolSeizeShareMantissa}));
         vars.liquidatorSeizeTokens = sub_(seizeTokens, vars.protocolSeizeTokens);
 
@@ -2067,11 +2073,13 @@ contract CToken is CTokenInterface, Exponential, TokenErrorReporter {
         accountTokens[liquidator] = vars.liquidatorTokensNew;
 
         /* Emit a Transfer event */
-        emit Transfer(borrower, liquidator, seizeTokens);
+        emit Transfer(borrower, liquidator, vars.liquidatorSeizeTokens);
+        emit Transfer(borrower, address(this), vars.protocolSeizeTokens);
         emit ReservesAdded(address(this), vars.protocolSeizeAmount, vars.totalReservesNew);
 
         /* We call the defense hook */
-        comptroller.seizeVerify(address(this), seizerToken, liquidator, borrower, seizeTokens);
+        // unused function
+        // comptroller.seizeVerify(address(this), seizerToken, liquidator, borrower, seizeTokens);
 
         return uint(Error.NO_ERROR);
     }
@@ -2150,6 +2158,25 @@ contract CToken is CTokenInterface, Exponential, TokenErrorReporter {
 
         // Emit NewComptroller(oldComptroller, newComptroller)
         emit NewComptroller(oldComptroller, newComptroller);
+
+        return uint(Error.NO_ERROR);
+    }
+
+    /**
+      * @notice Sets a new protocol seize share (when liquidating) for the protocol
+      * @dev Admin function to set a new protocol seize share
+      * @return uint 0=success, otherwise revert
+      */
+    function _setProtocolSeizeShare(uint newProtocolSeizeShareMantissa) external returns (uint) {
+        // Check caller is admin
+        require(msg.sender == admin, "Caller is not Admin");
+        require(newProtocolSeizeShareMantissa <= 1e18, "Protocol seize share must be < 100%");
+
+        uint oldProtocolSeizeShareMantissa = protocolSeizeShareMantissa;
+
+        protocolSeizeShareMantissa = newProtocolSeizeShareMantissa;
+
+        emit NewProtocolSeizeShare(oldProtocolSeizeShareMantissa, newProtocolSeizeShareMantissa);
 
         return uint(Error.NO_ERROR);
     }

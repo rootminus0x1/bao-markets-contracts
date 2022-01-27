@@ -360,6 +360,16 @@ contract CErc20Delegator is CTokenInterface, CErc20Interface, CDelegatorInterfac
     }
 
     /**
+      * @notice Sets a new protocol seize share (when liquidating) for the protocol
+      * @dev Admin function to set a new protocol seize share
+      * @return uint 0=success, otherwise revert
+      */
+    function _setProtocolSeizeShare(uint newProtocolSeizeShareMantissa) external returns (uint) {
+        bytes memory data = delegateToImplementation(abi.encodeWithSignature("_setProtocolSeizeShare(uint256)", newProtocolSeizeShareMantissa));
+        return abi.decode(data, (uint));
+    }
+
+    /**
       * @notice accrues interest and sets a new reserve factor for the protocol using _setReserveFactorFresh
       * @dev Admin function to accrue interest and set a new reserve factor
       * @return uint 0=success, otherwise a failure (see ErrorReporter.sol for details)

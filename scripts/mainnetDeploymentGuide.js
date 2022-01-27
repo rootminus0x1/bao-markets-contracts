@@ -63,8 +63,7 @@ async function main() {
         "0", //uint baseRatePerYear
         "49999999998268800", //uint multiplierPerYear
         "1089999999998841600", //uint jumpMultiplierPerYear
-        "800000000000000000", //uint kink_
-        "0x3dFc49e5112005179Da613BdE5973229082dAc35" //address owner_
+        "800000000000000000" //uint kink_
     );
     await JumpRateModelContract.deployTransaction.wait();
 
@@ -73,8 +72,7 @@ async function main() {
         "0", //uint baseRatePerYear
         "49999999998268800", //uint multiplierPerYear
         "1089999999998841600", //uint jumpMultiplierPerYear
-        "800000000000000000", //uint kink_
-        "0x3dFc49e5112005179Da613BdE5973229082dAc35" //address owner_
+        "800000000000000000" //uint kink_
     );
     await USDCJumpRateModelContract.deployTransaction.wait(); 
 
@@ -94,7 +92,6 @@ async function main() {
         "bao deposited bUSD",   //string memory name_
         "bdUSD",   //string memory symbol_
         "8",   //uint8 decimals_
-        "0x3dFc49e5112005179Da613BdE5973229082dAc35", //address payable admin_
         delegateContract.address, //address implementation
         0 //Unused data entry
     );
@@ -109,7 +106,6 @@ async function main() {
         "bao deposited USDC",   //string memory name_
         "bdUSDC",   //string memory symbol_
         "8",   //uint8 decimals_
-        "0x3dFc49e5112005179Da613BdE5973229082dAc35", //address payable admin_
         delegateContract.address, //address implementation
         0 //Unused data entry
     );
@@ -125,14 +121,13 @@ async function main() {
         "bao deposited ETH",   //string memory name_
         "bdETH",   //string memory symbol_
         "8",   //uint8 decimals_
-        "0x3dFc49e5112005179Da613BdE5973229082dAc35"  //address payable admin_
     );
     await bdEtherContract.deployTransaction.wait();
     console.log("bdTokens Deployed");
 
     //Deploy Fed
     const fedFactory = await ethers.getContractFactory("Fed");
-    fedContract = await fedFactory.deploy(bdUSDContract.address, "0x3dFc49e5112005179Da613BdE5973229082dAc35"); //CErc20 ctoken_, address gov_ 
+    fedContract = await fedFactory.deploy(bdUSDContract.address); //CErc20 ctoken_
     await fedContract.deployTransaction.wait();
     console.log("Fed Deployed");
 
@@ -140,7 +135,6 @@ async function main() {
     stabilizerContract = await stabilizerFactory.deploy(
       ERC20Contract.address, // bUSD address
       '0x6b175474e89094c44da98b954eedeac495271d0f', // DAI (Ethereum Mainnet)
-      '0x3dFc49e5112005179Da613BdE5973229082dAc35', // governance (Ethereum Multisig)
       100, // 1% buy fee
       100, // 1% sell fee
       '1500000000000000000000000'

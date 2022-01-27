@@ -1,12 +1,11 @@
 module.exports = [
-    "0x6B51a15C86B5B8000E0417E17AE40A574EcBB4bD",  //address underlying_
-    "0xb3ba973514f15724195a980e606F76C7f806a18A", //ComptrollerInterface comptroller_
-    "0x1777A92574B4a9Cf5a62869724D2dB603696B963",  //InterestRateModel interestRateModel_
+    "0x4ab319ae3ef47479c229fe742463b9b2cf1c7647",  //address underlying_
+    "0x831e1605dd6a085e3b47f6f094df2fa3806d7143", //ComptrollerInterface comptroller_
+    "0xEdbeB56978B5d80D3cbf016c9f8981A8915eE708",  //InterestRateModel interestRateModel_
     "200000000000000000",   //uint initialExchangeRateMantissa_
     "bao deposited bUSD",   //string memory name_
     "bdUSD",   //string memory symbol_
     "8",   //uint8 decimals_
-    "0x3Bc715CBCdabF25Df8FE81a887a4b02224D6932D", //address payable admin_
-    "0xfe537Ad55b788647a7f163b7F3086175463B6664", //address implementation
+    "0x11900786CF04bE6178287BCef5F53ffC63d110bF", //address implementation
     0, //Unused data entry  
 ];

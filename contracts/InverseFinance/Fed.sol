@@ -16,12 +16,12 @@ contract Fed {
     event Expansion(uint amount);
     event Contraction(uint amount);
 
-    constructor(CErc20 ctoken_, address gov_) public {
+    constructor(CErc20 ctoken_) public {
         ctoken = ctoken_;
         underlying = ERC20(ctoken_.underlying());
         underlying.approve(address(ctoken), uint(-1));
         chair = tx.origin;
-        gov = gov_;
+        gov = tx.origin;
     }
 
     function changeGov(address newGov_) public {

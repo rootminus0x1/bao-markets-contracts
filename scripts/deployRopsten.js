@@ -1,4 +1,5 @@
 const {ethers} = require('hardhat');
+const fs = require('fs');
 
 const main = async () => {
   let unitrollerContract, comptrollerContract, delegateContract, originalcomptrollerAddress, ERC20Contract,

@@ -192,13 +192,13 @@ const main = async () => {
   const setBorrowRestrictedSynthTx = await comptrollerContract._setBorrowRestriction([cERC20Contract.address], [false]);
   await setBorrowRestrictedSynthTx.wait();
   // Set the CollateralFactor for Synth
-  const setCollateralFactor1Tx = await comptrollerContract._setCollateralFactor(cERC20Contract.address, '750000000000000000');
+  const setCollateralFactor1Tx = await comptrollerContract._setCollateralFactor(cERC20Contract.address, '250000000000000000');
   await setCollateralFactor1Tx.wait();
   // Set the CollateralFactor for Eth
-  const setCollateralFactor2Tx = await comptrollerContract._setCollateralFactor(CEtherContract.address, '750000000000000000');
+  const setCollateralFactor2Tx = await comptrollerContract._setCollateralFactor(CEtherContract.address, '650000000000000000');
   await setCollateralFactor2Tx.wait();
   // Set the CollateralFactor for USDC
-  const setCollateralFactor3Tx = await comptrollerContract._setCollateralFactor(cUSDCContract.address, '750000000000000000');
+  const setCollateralFactor3Tx = await comptrollerContract._setCollateralFactor(cUSDCContract.address, '700000000000000000');
   await setCollateralFactor3Tx.wait();
   // Set the IMFFactor for Synth
   const setIMFFactor1Tx = await comptrollerContract._setIMFFactor(cERC20Contract.address, '40000000000000000');

@@ -1,6 +1,8 @@
 require("@nomiclabs/hardhat-waffle");
 require("@nomiclabs/hardhat-etherscan");
 require("hardhat-gas-reporter");
+require('dotenv').config();
+require("xdeployer");
 
 /**
  * @type import('hardhat/config').HardhatUserConfig
@@ -19,10 +21,19 @@ require("hardhat-gas-reporter");
       //accounts: [""]
     },
     ropsten: {
-      url: "https://ropsten.infura.io/v3/3929f51780ec46d6903b10b02207c53b",
+      url: process.env.ROPSTEN_URL,
       //Consider any address posted here to be compromised
-      accounts: ["26cf0e71eeb12471b708d6cc9f27a864594b73338da439c2e6acf7571eaeeaa7","26f79db75776e49903be1f2f5d44b0ce3167b865b3cfc02c6e7ee3973ce8dc64"]
+      accounts: [process.env.PRIVATE_KEY_1,process.env.PRIVATE_KEY_2]
     }
+  },
+  xdeploy: {
+    contract: "contracts/InverseFinance/Stabilizer.sol:Stabilizer",
+    constructorArgsPath: "./scripts/verificationArgs/stabilizerArguments.js",
+    salt: "UwU",
+    signer: process.env.PRIVATE_KEY_1,
+    networks: ["ropsten"],
+    rpcUrls: [process.env.ROPSTEN_URL],
+    gasLimit: 6 * 10 ** 6,
   },
   solidity: {
     compilers: [
@@ -55,6 +66,6 @@ require("hardhat-gas-reporter");
     gasPriceApi: "https://api.etherscan.io/api?module=proxy&action=eth_gasPrice"
   },
   etherscan: {
-    apiKey: ""
+    apiKey: process.env.ETHERSCAN_KEY
   }
 };

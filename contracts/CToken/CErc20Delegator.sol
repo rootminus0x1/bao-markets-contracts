@@ -17,7 +17,6 @@ contract CErc20Delegator is CTokenInterface, CErc20Interface, CDelegatorInterfac
      * @param name_ ERC-20 name of this token
      * @param symbol_ ERC-20 symbol of this token
      * @param decimals_ ERC-20 decimal precision of this token
-     * @param admin_ Address of the administrator of this token
      * @param implementation_ The address of the implementation the contract delegates to
      * @param becomeImplementationData The encoded args for becomeImplementation
      */
@@ -28,11 +27,10 @@ contract CErc20Delegator is CTokenInterface, CErc20Interface, CDelegatorInterfac
                 string memory name_,
                 string memory symbol_,
                 uint8 decimals_,
-                address payable admin_,
                 address implementation_,
                 bytes memory becomeImplementationData) public {
         // Creator of the contract is admin during initialization
-        admin = tx.origin;
+        admin = msg.sender;
 
         // First delegate gets to initialize the delegator (i.e. storage contract)
         delegateTo(implementation_, abi.encodeWithSignature("initialize(address,address,address,uint256,string,string,uint8)",
@@ -48,7 +46,7 @@ contract CErc20Delegator is CTokenInterface, CErc20Interface, CDelegatorInterfac
         _setImplementation(implementation_, false, becomeImplementationData);
 
         // Set the proper admin now that initialization is done
-        admin = admin_;
+        admin = tx.origin;
     }
 
     /**

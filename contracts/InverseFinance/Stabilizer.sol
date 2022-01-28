@@ -27,12 +27,12 @@ contract Stabilizer {
     IStrat public strat;
     address public governance;
 
-    constructor(ERC20 synth_, ERC20 reserve_, address gov_, uint buyFee_, uint sellFee_, uint supplyCap_) public {
+    constructor(ERC20 synth_, ERC20 reserve_, uint buyFee_, uint sellFee_, uint supplyCap_) public {
         require(buyFee_ <= MAX_FEE, "buyFee_ too high");
         require(sellFee_ <= MAX_FEE, "sellFee_ too high");
         synth = synth_;
         reserve = reserve_;
-        governance = gov_;
+        governance = tx.origin;
         buyFee = buyFee_;
         sellFee = sellFee_;
         operator = tx.origin;

@@ -41,8 +41,8 @@ contract Unitroller is UnitrollerAdminStorage, ComptrollerErrorReporter {
     event NewAdmin(address oldAdmin, address newAdmin);
 
     constructor() public {
-        // Set admin to caller
-        admin = msg.sender;
+        // Set admin to original caller
+        admin = tx.origin;
     }
 
     /*** Admin Functions ***/

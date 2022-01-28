@@ -16,12 +16,12 @@ contract Fed {
     event Expansion(uint amount);
     event Contraction(uint amount);
 
-    constructor(CErc20 ctoken_, address gov_) public {
+    constructor(CErc20 ctoken_) public {
         ctoken = ctoken_;
         underlying = ERC20(ctoken_.underlying());
         underlying.approve(address(ctoken), uint(-1));
-        chair = msg.sender;
-        gov = gov_;
+        chair = tx.origin;
+        gov = tx.origin;
     }
 
     function changeGov(address newGov_) public {
@@ -42,7 +42,7 @@ contract Fed {
     function expansion(uint amount) public {
         require(msg.sender == chair, "ONLY CHAIR");
         underlying.mint(address(this), amount);
-        require(ctoken.mint(amount) == 0, 'Supplying failed');
+        require(ctoken.mint(amount, false) == 0, 'Supplying failed');
         supply = supply.add(amount);
         emit Expansion(amount);
     }

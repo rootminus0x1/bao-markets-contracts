@@ -41,8 +41,8 @@ contract Unitroller is UnitrollerAdminStorage, ComptrollerErrorReporter {
     event NewAdmin(address oldAdmin, address newAdmin);
 
     constructor() public {
-        // Set admin to caller
-        admin = msg.sender;
+        // Set admin to original caller
+        admin = tx.origin;
     }
 
     /*** Admin Functions ***/
@@ -246,7 +246,7 @@ contract Comptroller is ComptrollerV5Storage, ComptrollerInterface, ComptrollerE
     mapping(address => bool) public borrowWhitelist;
 
     constructor() public {
-        admin = msg.sender;
+        admin = tx.origin;
     }
 
     function sqrt(uint y) internal pure returns (uint z) {
@@ -294,16 +294,28 @@ contract Comptroller is ComptrollerV5Storage, ComptrollerInterface, ComptrollerE
     /**
      * @notice Add assets to be included in account liquidity calculation
      * @param cTokens The list of addresses of the cToken markets to be enabled
+     * @param borrower Optional parameter that is only used when a cToken calls this function
      * @return Success indicator for whether each corresponding market was entered
      */
-    function enterMarkets(address[] memory cTokens) public returns (uint[] memory) {
+    function enterMarkets(address[] memory cTokens, address borrower) public returns (uint[] memory) {
         uint len = cTokens.length;
 
         uint[] memory results = new uint[](len);
-        for (uint i = 0; i < len; i++) {
-            CToken cToken = CToken(cTokens[i]);
+        //If Command comes from a verified cToken, then the borrower can be entered into the market
+        if(cTokens[0] == msg.sender && markets[cTokens[0]].isListed){
+            require(len == 1);
+            CToken cToken = CToken(cTokens[0]);
 
-            results[i] = uint(addToMarketInternal(cToken, msg.sender));
+            results[0] = uint(addToMarketInternal(cToken, borrower));
+        }else{
+            uint len = cTokens.length;
+
+            uint[] memory results = new uint[](len);
+            for (uint i = 0; i < len; i++) {
+                CToken cToken = CToken(cTokens[i]);
+
+                results[i] = uint(addToMarketInternal(cToken, msg.sender));
+            }
         }
 
         return results;

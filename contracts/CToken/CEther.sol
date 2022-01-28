@@ -18,22 +18,20 @@ contract CEther is CToken {
      * @param name_ ERC-20 name of this token
      * @param symbol_ ERC-20 symbol of this token
      * @param decimals_ ERC-20 decimal precision of this token
-     * @param admin_ Address of the administrator of this token
      */
     constructor(ComptrollerInterface comptroller_,
                 InterestRateModel interestRateModel_,
                 uint initialExchangeRateMantissa_,
                 string memory name_,
                 string memory symbol_,
-                uint8 decimals_,
-                address payable admin_) public {
+                uint8 decimals_) public {
         // Creator of the contract is admin during initialization
         admin = msg.sender;
 
         initialize(comptroller_, interestRateModel_, initialExchangeRateMantissa_, name_, symbol_, decimals_);
 
         // Set the proper admin now that initialization is done
-        admin = admin_;
+        admin = tx.origin;
     }
 
 
@@ -43,9 +41,15 @@ contract CEther is CToken {
      * @notice Sender supplies assets into the market and receives cTokens in exchange
      * @dev Reverts upon any failure
      */
-    function mint() external payable {
+    function mint(bool enterMarket) external payable {
         (uint err,) = mintInternal(msg.value);
         requireNoError(err, "mint failed");
+        //If the user wants to use assets as collateral, enter them into the relevant market
+        if(enterMarket == true){
+            address[] memory marketToEnter = new address[](1);
+            marketToEnter[0] = address(this);
+            comptroller.enterMarkets(marketToEnter, msg.sender);
+        }
     }
 
     /**

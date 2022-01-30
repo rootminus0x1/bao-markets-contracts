@@ -27,8 +27,8 @@ require("xdeployer");
     }
   },
   xdeploy: {
-    contract: "contracts/InverseFinance/Stabilizer.sol:Stabilizer",
-    constructorArgsPath: "./scripts/verificationArgs/stabilizerArguments.js",
+    contract: "CErc20Delegator",
+    constructorArgsPath: "./scripts/verificationArgs/bdUSDCArguments.js",
     salt: "UwU",
     signer: process.env.PRIVATE_KEY_1,
     networks: ["ropsten"],

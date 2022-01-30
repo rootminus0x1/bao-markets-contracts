@@ -162,7 +162,7 @@ contract Unitroller is UnitrollerAdminStorage, ComptrollerErrorReporter {
  * @title Compound's Comptroller Contract
  * @author Compound
  */
-contract Comptroller is ComptrollerV5Storage, ComptrollerInterface, ComptrollerErrorReporter, ExponentialNoError {
+contract Comptroller is ComptrollerV6Storage, ComptrollerInterface, ComptrollerErrorReporter, ExponentialNoError {
     /// @notice Emitted when an admin supports a market
     event MarketListed(CToken cToken);
 
@@ -234,16 +234,6 @@ contract Comptroller is ComptrollerV5Storage, ComptrollerInterface, ComptrollerE
 
     // No collateralFactorMantissa may exceed this value
     uint internal constant collateralFactorMaxMantissa = 0.9e18; // 0.9
-
-    /**
-     * @notice Mapping of assets that can only be borrowed by whitelist
-     */
-    mapping(address => bool) public borrowRestricted;
-
-    /**
-     * @notice Mapping of account addresses that are allowed to borrow restricted assets
-     */
-    mapping(address => bool) public borrowWhitelist;
 
     constructor() public {
         admin = tx.origin;

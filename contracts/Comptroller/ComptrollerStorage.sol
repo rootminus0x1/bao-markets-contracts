@@ -147,3 +147,15 @@ contract ComptrollerV5Storage is ComptrollerV4Storage {
     /// @notice Last block at which a contributor's COMP rewards have been allocated
     mapping(address => uint) public lastContributorBlock;
 }
+
+contract ComptrollerV6Storage is ComptrollerV5Storage {
+    /**
+     * @notice Mapping of assets that can only be borrowed by whitelist
+     */
+    mapping(address => bool) public borrowRestricted;
+
+    /**
+     * @notice Mapping of account addresses that are allowed to borrow restricted assets
+     */
+    mapping(address => bool) public borrowWhitelist;
+}

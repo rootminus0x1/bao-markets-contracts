@@ -133,6 +133,15 @@ contract BaseJumpRateModelV2 {
 
         emit NewInterestParams(baseRatePerBlock, multiplierPerBlock, jumpMultiplierPerBlock, kink);
     }
+
+    /**
+     * @notice external function to transfer owner role
+     * @param _newOwner The new owner address
+     */
+    function setAdmin(address _newOwner) external {
+        require(msg.sender == owner, "only the owner may call this function.");
+        owner = _newOwner;
+    }
 }
 
 /**

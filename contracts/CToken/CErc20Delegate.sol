@@ -40,4 +40,14 @@ contract CErc20Delegate is CErc20, CDelegateInterface {
 
         require(msg.sender == admin, "only the admin may call _resignImplementation");
     }
+
+    /**
+     * @notice Only used when wanting to change the initial exchange rate without re-deploying the contracts
+     * Will not have an effect after the cERC20 contract is in use
+     */
+    function _setInitialExchangeRate(uint _newInitialExchangeRateMantissa) external {
+        require(msg.sender == admin, "only the admin may call _setInitialExchangeRate");
+
+        initialExchangeRateMantissa = _newInitialExchangeRateMantissa;
+    }
 }

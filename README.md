@@ -32,7 +32,7 @@ USDC interest rate model  		| 0x681Cf55f0276126FAD8842133C839AB4D607E729|[Link](
 bdUSDC		 					| 0x7749f9f3206A49d4c47b60db05716409dC3A4149|[Link](https://etherscan.io/address/0x7749f9f3206A49d4c47b60db05716409dC3A4149)|
 baoUSD-3Pool 					| 0x0FaFaFD3C393ead5F5129cFC7e0E12367088c473|[Link](https://etherscan.io/address/0x0FaFaFD3C393ead5F5129cFC7e0E12367088c473)|
 bdSTBL                          | 0xE0a55c00E6510F4F7df9af78b116B7f8E705cA8F|[Link](https://etherscan.io/address/0xE0a55c00E6510F4F7df9af78b116B7f8E705cA8F)|
-bdSTBL Price Oracle             | 0x8A209F3697b706e7d758C65CD8D757E0e7D76ac3|[Link](https://etherscan.io/address/0x8A209F3697b706e7d758C65CD8D757E0e7D76ac3)|
+bdSTBL Price Oracle             | 0x4626CEB86aBF6B239e3306382Cca44e5B7113160|[Link](https://etherscan.io/address/0x4626CEB86aBF6B239e3306382Cca44e5B7113160)|
 
 # Deployed Ropsten Contracts
 

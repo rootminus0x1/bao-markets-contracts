@@ -1,6 +1,8 @@
 import "./CErc20.sol";
 
-pragma solidity ^0.5.16;
+// SPDX-License-Identifier: UNLICENSED
+
+pragma solidity ^0.8.1;
 
 /**
  * @title Compound's CErc20Delegate Contract
@@ -11,13 +13,13 @@ contract CErc20Delegate is CErc20, CDelegateInterface {
     /**
      * @notice Construct an empty delegate
      */
-    constructor() public {}
+    constructor() {}
 
     /**
      * @notice Called by the delegator on a delegate to initialize it for duty
      * @param data The encoded bytes data for any initialization
      */
-    function _becomeImplementation(bytes memory data) public {
+    function _becomeImplementation(bytes memory data) public override {
         // Shh -- currently unused
         data;
 
@@ -32,7 +34,7 @@ contract CErc20Delegate is CErc20, CDelegateInterface {
     /**
      * @notice Called by the delegator on a delegate to forfeit its responsibility
      */
-    function _resignImplementation() public {
+    function _resignImplementation() public override {
         // Shh -- we don't ever want this hook to be marked pure
         if (false) {
             implementation = address(0);

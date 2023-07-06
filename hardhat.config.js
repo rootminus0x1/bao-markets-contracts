@@ -3,6 +3,7 @@ require("@nomiclabs/hardhat-etherscan");
 require("hardhat-gas-reporter");
 require('dotenv').config();
 require("xdeployer");
+//require('hardhat-dependency-compiler'); // extra (e.g. test) contract compilation
 
 /**
  * @type import('hardhat/config').HardhatUserConfig
@@ -20,12 +21,15 @@ require("xdeployer");
       //Consider any address posted here to be compromised
       //accounts: [""]
     },
+/*
     ropsten: {
       url: process.env.ROPSTEN_URL,
       //Consider any address posted here to be compromised
       accounts: [process.env.PRIVATE_KEY_1,process.env.PRIVATE_KEY_2]
     }
+*/
   },
+/*
   xdeploy: {
     contract: "CErc20Delegator",
     constructorArgsPath: "./scripts/verificationArgs/bdUSDCArguments.js",
@@ -35,6 +39,7 @@ require("xdeployer");
     rpcUrls: [process.env.ROPSTEN_URL],
     gasLimit: 6 * 10 ** 6,
   },
+*/
   solidity: {
     compilers: [
       {
@@ -57,6 +62,17 @@ require("xdeployer");
       }
     ],
   },
+  paths: {
+    tests: './test', //default
+    sources: './contracts',  //default
+  },
+  /*
+  dependencyCompiler: {
+    paths: [ // relative to a subdirectory of 'sources' directory above
+      'test/ComptrollerHarness.sol',
+    ]
+  },
+  */
   mocha: {
     timeout: 10000000000
   },

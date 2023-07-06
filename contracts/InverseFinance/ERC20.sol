@@ -1,7 +1,8 @@
-import { CErc20Storage } from "../CToken/CToken.sol";
+// SPDX-License-Identifier: Unlicense
+import { CErc20Storage, CToken } from "../CToken/CToken.sol";
 import "../Utils/SafeMath.sol";
 
-pragma solidity ^0.5.16;
+pragma solidity ^0.8.1;
 
 contract ERC20 {
     using SafeMath for uint;
@@ -32,21 +33,18 @@ contract ERC20 {
         _;
     }
 
-    constructor(string memory name_, string memory symbol_, uint8 decimals_) public {
+    constructor(string memory name_, string memory symbol_, uint8 decimals_) {
         name = name_;
         symbol = symbol_;
         decimals = decimals_;
         operator = tx.origin;
-        uint chainId;
-        assembly {
-            chainId := chainid
-        }
+
         DOMAIN_SEPARATOR = keccak256(
             abi.encode(
                 keccak256('EIP712Domain(string name,string version,uint256 chainId,address verifyingContract)'),
                 keccak256(bytes(name)),
                 keccak256(bytes('1')),
-                chainId,
+                block.chainid, // from solc 0.8
                 address(this)
             )
         );
@@ -116,7 +114,7 @@ contract ERC20 {
     }
 
     function transferFrom(address from, address to, uint value) external returns (bool) {
-        if (allowance[from][msg.sender] != uint(-1)) {
+        if (allowance[from][msg.sender] != CToken.none) {
             allowance[from][msg.sender] = allowance[from][msg.sender].sub(value);
         }
         _transfer(from, to, value);

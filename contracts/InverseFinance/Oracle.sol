@@ -1,19 +1,22 @@
 import "../CToken/CToken.sol";
+import "../PriceOracle.sol";
 
-pragma solidity ^0.5.16;
+// SPDX-License-Identifier: UNLICENSED
 
-contract PriceOracle {
-    /// @notice Indicator that this is a PriceOracle contract (for inspection)
-    bool public constant isPriceOracle = true;
+pragma solidity ^0.8.1;
 
-    /**
-      * @notice Get the underlying price of a cToken asset
-      * @param cToken The cToken to get the underlying price of
-      * @return The underlying asset price mantissa (scaled by 1e18).
-      *  Zero means the price is unavailable.
-      */
-    function getUnderlyingPrice(CToken cToken) external view returns (uint);
-}
+// abstract contract PriceOracle {
+//     /// @notice Indicator that this is a PriceOracle contract (for inspection)
+//     bool public constant isPriceOracle = true;
+
+//     /**
+//       * @notice Get the underlying price of a cToken asset
+//       * @param cToken The cToken to get the underlying price of
+//       * @return The underlying asset price mantissa (scaled by 1e18).
+//       *  Zero means the price is unavailable.
+//       */
+//     function getUnderlyingPrice(CToken cToken) external virtual view returns (uint);
+// }
 
 interface Feed {
     function decimals() external view returns (uint8);
@@ -37,7 +40,7 @@ contract Oracle is PriceOracle {
         _;
     }
 
-    constructor() public {
+    constructor() {
         owner = tx.origin;
     }
 
@@ -61,7 +64,7 @@ contract Oracle is PriceOracle {
         delete fixedPrices[address(cToken_)];
     }
 
-    function getUnderlyingPrice(CToken cToken_) public view returns (uint) {
+    function getUnderlyingPrice(CToken cToken_) public override view returns (uint) {
         FeedData memory feed = feeds[address(cToken_)]; // gas savings
         if(feed.addr != address(0)) {
             uint decimals = uint(DECIMALS - feed.tokenDecimals - Feed(feed.addr).decimals());

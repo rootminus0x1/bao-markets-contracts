@@ -1,7 +1,9 @@
 import "../Utils/ErrorReporter.sol";
 import "../Utils/FixedPointMathLib.sol";
 
-pragma solidity ^0.5.16;
+// SPDX-License-Identifier: UNLICENSED
+
+pragma solidity ^0.8.1;
 
 /**
  * @title EIP20NonStandardInterface
@@ -19,7 +21,7 @@ interface EIP20NonStandardInterface {
     /**
      * @notice Gets the balance of the specified address
      * @param owner The address from which the balance will be retrieved
-     * @return The balance
+     * @return balance The balance
      */
     function balanceOf(address owner) external view returns (uint256 balance);
 
@@ -56,7 +58,7 @@ interface EIP20NonStandardInterface {
       *  and is subject to issues noted [here](https://eips.ethereum.org/EIPS/eip-20#approve)
       * @param spender The address of the account which may transfer tokens
       * @param amount The number of tokens that are approved
-      * @return Whether or not the approval succeeded
+      * @return success Whether or not the approval succeeded
       */
     function approve(address spender, uint256 amount) external returns (bool success);
 
@@ -64,7 +66,7 @@ interface EIP20NonStandardInterface {
       * @notice Get the current allowance from `owner` for `spender`
       * @param owner The address of the account which owns the tokens to be spent
       * @param spender The address of the account which may transfer tokens
-      * @return The number of tokens allowed to be spent
+      * @return remaining The number of tokens allowed to be spent
       */
     function allowance(address owner, address spender) external view returns (uint256 remaining);
 
@@ -90,7 +92,7 @@ interface EIP20Interface {
     /**
      * @notice Gets the balance of the specified address
      * @param owner The address from which the balance will be retrieved
-     * @return The balance
+     * @return balance The balance
      */
     function balanceOf(address owner) external view returns (uint256 balance);
 
@@ -98,7 +100,7 @@ interface EIP20Interface {
       * @notice Transfer `amount` tokens from `msg.sender` to `dst`
       * @param dst The address of the destination account
       * @param amount The number of tokens to transfer
-      * @return Whether or not the transfer succeeded
+      * @return success Whether or not the transfer succeeded
       */
     function transfer(address dst, uint256 amount) external returns (bool success);
 
@@ -107,7 +109,7 @@ interface EIP20Interface {
       * @param src The address of the source account
       * @param dst The address of the destination account
       * @param amount The number of tokens to transfer
-      * @return Whether or not the transfer succeeded
+      * @return success Whether or not the transfer succeeded
       */
     function transferFrom(address src, address dst, uint256 amount) external returns (bool success);
 
@@ -117,7 +119,7 @@ interface EIP20Interface {
       *  and is subject to issues noted [here](https://eips.ethereum.org/EIPS/eip-20#approve)
       * @param spender The address of the account which may transfer tokens
       * @param amount The number of tokens that are approved (-1 means infinite)
-      * @return Whether or not the approval succeeded
+      * @return success Whether or not the approval succeeded
       */
     function approve(address spender, uint256 amount) external returns (bool success);
 
@@ -125,7 +127,7 @@ interface EIP20Interface {
       * @notice Get the current allowance from `owner` for `spender`
       * @param owner The address of the account which owns the tokens to be spent
       * @param spender The address of the account which may transfer tokens
-      * @return The number of tokens allowed to be spent (-1 means infinite)
+      * @return remaining The number of tokens allowed to be spent (-1 means infinite)
       */
     function allowance(address owner, address spender) external view returns (uint256 remaining);
 
@@ -594,7 +596,7 @@ contract Exponential is CarefulMath, ExponentialNoError {
   * @title Compound's InterestRateModel Interface
   * @author Compound
   */
-contract InterestRateModel {
+abstract contract InterestRateModel {
     /// @notice Indicator that this is an InterestRateModel contract (for inspection)
     bool public constant isInterestRateModel = true;
 
@@ -605,7 +607,7 @@ contract InterestRateModel {
       * @param reserves The total amount of reserves the market has
       * @return The borrow rate per block (as a percentage, and scaled by 1e18)
       */
-    function getBorrowRate(uint cash, uint borrows, uint reserves) external view returns (uint);
+    function getBorrowRate(uint cash, uint borrows, uint reserves) external virtual view returns (uint);
 
     /**
       * @notice Calculates the current supply interest rate per block
@@ -615,7 +617,7 @@ contract InterestRateModel {
       * @param reserveFactorMantissa The current reserve factor the market has
       * @return The supply rate per block (as a percentage, and scaled by 1e18)
       */
-    function getSupplyRate(uint cash, uint borrows, uint reserves, uint reserveFactorMantissa) external view returns (uint);
+    function getSupplyRate(uint cash, uint borrows, uint reserves, uint reserveFactorMantissa) external virtual view returns (uint);
 
 }
 
@@ -640,13 +642,13 @@ contract CTokenStorage {
      */
     uint8 public decimals;
 
-    /**
+    /*
      * @notice Maximum borrow rate that can ever be applied (.0005% / block)
      */
 
     uint internal constant borrowRateMaxMantissa = 0.0005e16;
 
-    /**
+    /*
      * @notice Maximum fraction of interest that can be set aside for reserves
      */
     uint internal constant reserveFactorMaxMantissa = 1e18;
@@ -671,7 +673,7 @@ contract CTokenStorage {
      */
     InterestRateModel public interestRateModel;
 
-    /**
+    /*
      * @notice Initial exchange rate used when minting the first CTokens (used when totalSupply = 0)
      */
     uint internal initialExchangeRateMantissa;
@@ -706,12 +708,12 @@ contract CTokenStorage {
      */
     uint public totalSupply;
 
-    /**
+    /*
      * @notice Official record of token balances for each account
      */
     mapping (address => uint) internal accountTokens;
 
-    /**
+    /*
      * @notice Approved token transfer amounts on behalf of others
      */
     mapping (address => mapping (address => uint)) internal transferAllowances;
@@ -726,7 +728,7 @@ contract CTokenStorage {
         uint interestIndex;
     }
 
-    /**
+    /*
      * @notice Mapping of account addresses to outstanding borrow balances
      */
     mapping(address => BorrowSnapshot) internal accountBorrows;
@@ -737,7 +739,7 @@ contract CTokenStorage {
     uint public protocolSeizeShareMantissa = 2.8e16; //2.8%
 }
 
-contract CTokenInterface is CTokenStorage {
+abstract contract CTokenInterface is CTokenStorage {
     /**
      * @notice Indicator that this is a CToken contract (for inspection)
      */
@@ -837,32 +839,32 @@ contract CTokenInterface is CTokenStorage {
 
     /*** User Interface ***/
 
-    function transfer(address dst, uint amount) external returns (bool);
-    function transferFrom(address src, address dst, uint amount) external returns (bool);
-    function approve(address spender, uint amount) external returns (bool);
-    function allowance(address owner, address spender) external view returns (uint);
-    function balanceOf(address owner) external view returns (uint);
-    function getAccountSnapshot(address account) external view returns (uint, uint, uint, uint);
-    function borrowRatePerBlock() external view returns (uint);
-    function supplyRatePerBlock() external view returns (uint);
-    function totalBorrowsCurrent() external returns (uint);
-    function borrowBalanceCurrent(address account) external returns (uint);
-    function borrowBalanceStored(address account) public view returns (uint);
-    function exchangeRateStored() public view returns (uint);
-    function getCash() external view returns (uint);
-    function accrueInterest() public returns (uint);
-    function seize(address liquidator, address borrower, uint seizeTokens) external returns (uint);
+    function transfer(address dst, uint amount) external virtual returns (bool);
+    function transferFrom(address src, address dst, uint amount) external virtual returns (bool);
+    function approve(address spender, uint amount) external virtual returns (bool);
+    function allowance(address owner, address spender) external view virtual returns (uint);
+    function balanceOf(address owner) external view virtual returns (uint);
+    function getAccountSnapshot(address account) external view virtual returns (uint, uint, uint, uint);
+    function borrowRatePerBlock() external view virtual returns (uint);
+    function supplyRatePerBlock() external view virtual returns (uint);
+    function totalBorrowsCurrent() external virtual returns (uint);
+    function borrowBalanceCurrent(address account) external virtual returns (uint);
+    function borrowBalanceStored(address account) public view virtual returns (uint);
+    function exchangeRateStored() public view virtual returns (uint);
+    function getCash() external view virtual returns (uint);
+    function accrueInterest() public virtual returns (uint);
+    function seize(address liquidator, address borrower, uint seizeTokens) external virtual returns (uint);
 
 
     /*** Admin Functions ***/
 
-    function _setPendingAdmin(address payable newPendingAdmin) external returns (uint);
-    function _acceptAdmin() external returns (uint);
-    function _setComptroller(ComptrollerInterface newComptroller) public returns (uint);
-    function _setReserveFactor(uint newReserveFactorMantissa) external returns (uint);
-    function _reduceReserves(uint reduceAmount) external returns (uint);
-    function _setInterestRateModel(InterestRateModel newInterestRateModel) public returns (uint);
-    function _setProtocolSeizeShare(uint newProtocolSeizeShareMantissa) external returns (uint);
+    function _setPendingAdmin(address payable newPendingAdmin) external virtual returns (uint);
+    function _acceptAdmin() external virtual returns (uint);
+    function _setComptroller(ComptrollerInterface newComptroller) public virtual returns (uint);
+    function _setReserveFactor(uint newReserveFactorMantissa) external virtual returns (uint);
+    function _reduceReserves(uint reduceAmount) external virtual returns (uint);
+    function _setInterestRateModel(InterestRateModel newInterestRateModel) public virtual returns (uint);
+    function _setProtocolSeizeShare(uint newProtocolSeizeShareMantissa) external virtual returns (uint);
 }
 
 contract CErc20Storage {
@@ -872,22 +874,22 @@ contract CErc20Storage {
     address public underlying;
 }
 
-contract CErc20Interface is CErc20Storage {
+abstract contract CErc20Interface is CErc20Storage {
 
     /*** User Interface ***/
 
-    function mint(uint mintAmount, bool enterMarket) external returns (uint);
-    function redeem(uint redeemTokens) external returns (uint);
-    function redeemUnderlying(uint redeemAmount) external returns (uint);
-    function borrow(uint borrowAmount) external returns (uint);
-    function repayBorrow(uint repayAmount) external returns (uint);
-    function repayBorrowBehalf(address borrower, uint repayAmount) external returns (uint);
-    function liquidateBorrow(address borrower, uint repayAmount, CTokenInterface cTokenCollateral) external returns (uint);
+    function mint(uint mintAmount, bool enterMarket) external virtual returns (uint);
+    function redeem(uint redeemTokens) external virtual returns (uint);
+    function redeemUnderlying(uint redeemAmount) external virtual returns (uint);
+    function borrow(uint borrowAmount) external virtual returns (uint);
+    function repayBorrow(uint repayAmount) external virtual returns (uint);
+    function repayBorrowBehalf(address borrower, uint repayAmount) external virtual returns (uint);
+    function liquidateBorrow(address borrower, uint repayAmount, CTokenInterface cTokenCollateral) external virtual returns (uint);
 
 
     /*** Admin Functions ***/
 
-    function _addReserves(uint addAmount) external returns (uint);
+    function _addReserves(uint addAmount) external virtual returns (uint);
 }
 
 contract CDelegationStorage {
@@ -897,7 +899,7 @@ contract CDelegationStorage {
     address public implementation;
 }
 
-contract CDelegatorInterface is CDelegationStorage {
+abstract contract CDelegatorInterface is CDelegationStorage {
     /**
      * @notice Emitted when implementation is changed
      */
@@ -909,91 +911,91 @@ contract CDelegatorInterface is CDelegationStorage {
      * @param allowResign Flag to indicate whether to call _resignImplementation on the old implementation
      * @param becomeImplementationData The encoded bytes data to be passed to _becomeImplementation
      */
-    function _setImplementation(address implementation_, bool allowResign, bytes memory becomeImplementationData) public;
+    function _setImplementation(address implementation_, bool allowResign, bytes memory becomeImplementationData) public virtual;
 }
 
-contract CDelegateInterface is CDelegationStorage {
+abstract contract CDelegateInterface is CDelegationStorage {
     /**
      * @notice Called by the delegator on a delegate to initialize it for duty
      * @dev Should revert if any issues arise which make it unfit for delegation
      * @param data The encoded bytes data for any initialization
      */
-    function _becomeImplementation(bytes memory data) public;
+    function _becomeImplementation(bytes memory data) public virtual;
 
     /**
      * @notice Called by the delegator on a delegate to forfeit its responsibility
      */
-    function _resignImplementation() public;
+    function _resignImplementation() public virtual;
 }
 
-contract ComptrollerInterface {
+abstract contract ComptrollerInterface {
     /// @notice Indicator that this is a Comptroller contract (for inspection)
     bool public constant isComptroller = true;
 
     /*** Assets You Are In ***/
 
-    function enterMarkets(address[] calldata cTokens, address borrower) external returns (uint[] memory);
-    function exitMarket(address cToken) external returns (uint);
+    function enterMarkets(address[] calldata cTokens, address borrower) external virtual returns (uint[] memory);
+    function exitMarket(address cToken) external virtual returns (uint);
 
     /*** Policy Hooks ***/
 
-    function mintAllowed(address cToken, address minter, uint mintAmount) external returns (uint);
-    function mintVerify(address cToken, address minter, uint mintAmount, uint mintTokens) external;
+    function mintAllowed(address cToken, address minter, uint mintAmount) external virtual returns (uint);
+    function mintVerify(address cToken, address minter, uint mintAmount, uint mintTokens) external virtual;
 
-    function redeemAllowed(address cToken, address redeemer, uint redeemTokens) external returns (uint);
-    function redeemVerify(address cToken, address redeemer, uint redeemAmount, uint redeemTokens) external;
+    function redeemAllowed(address cToken, address redeemer, uint redeemTokens) external virtual returns (uint);
+    function redeemVerify(address cToken, address redeemer, uint redeemAmount, uint redeemTokens) external virtual;
 
-    function borrowAllowed(address cToken, address borrower, uint borrowAmount) external returns (uint);
-    function borrowVerify(address cToken, address borrower, uint borrowAmount) external;
+    function borrowAllowed(address cToken, address borrower, uint borrowAmount) external virtual returns (uint);
+    function borrowVerify(address cToken, address borrower, uint borrowAmount) external virtual;
 
     function repayBorrowAllowed(
         address cToken,
         address payer,
         address borrower,
-        uint repayAmount) external returns (uint);
+        uint repayAmount) external virtual returns (uint);
     function repayBorrowVerify(
         address cToken,
         address payer,
         address borrower,
         uint repayAmount,
-        uint borrowerIndex) external;
+        uint borrowerIndex) external virtual;
 
     function liquidateBorrowAllowed(
         address cTokenBorrowed,
         address cTokenCollateral,
         address liquidator,
         address borrower,
-        uint repayAmount) external returns (uint);
+        uint repayAmount) external virtual returns (uint);
     function liquidateBorrowVerify(
         address cTokenBorrowed,
         address cTokenCollateral,
         address liquidator,
         address borrower,
         uint repayAmount,
-        uint seizeTokens) external;
+        uint seizeTokens) external virtual;
 
     function seizeAllowed(
         address cTokenCollateral,
         address cTokenBorrowed,
         address liquidator,
         address borrower,
-        uint seizeTokens) external returns (uint);
+        uint seizeTokens) external virtual returns (uint);
     function seizeVerify(
         address cTokenCollateral,
         address cTokenBorrowed,
         address liquidator,
         address borrower,
-        uint seizeTokens) external;
+        uint seizeTokens) external virtual;
 
-    function transferAllowed(address cToken, address src, address dst, uint transferTokens) external returns (uint);
-    function transferVerify(address cToken, address src, address dst, uint transferTokens) external;
+    function transferAllowed(address cToken, address src, address dst, uint transferTokens) external virtual returns (uint);
+    function transferVerify(address cToken, address src, address dst, uint transferTokens) external virtual;
 
     /*** Liquidity/Liquidation Calculations ***/
 
     function liquidateCalculateSeizeTokens(
         address cTokenBorrowed,
         address cTokenCollateral,
-        uint repayAmount) external view returns (uint, uint);
+        uint repayAmount) external view virtual returns (uint, uint);
 }
 
 /**
@@ -1001,8 +1003,9 @@ contract ComptrollerInterface {
  * @notice Abstract base for CTokens
  * @author Compound
  */
-contract CToken is CTokenInterface, Exponential, TokenErrorReporter {
+abstract contract CToken is CTokenInterface, Exponential, TokenErrorReporter {
     using FixedPointMathLib for uint256;
+    uint constant public none = type(uint).max; // -1
 
     /**
      * @notice Initialize the money market
@@ -1070,7 +1073,7 @@ contract CToken is CTokenInterface, Exponential, TokenErrorReporter {
         /* Get the allowance, infinite for the account owner */
         uint startingAllowance = 0;
         if (spender == src) {
-            startingAllowance = uint(-1);
+            startingAllowance = none;
         } else {
             startingAllowance = transferAllowances[src][spender];
         }
@@ -1104,7 +1107,7 @@ contract CToken is CTokenInterface, Exponential, TokenErrorReporter {
         accountTokens[dst] = dstTokensNew;
 
         /* Eat some of the allowance (if necessary) */
-        if (startingAllowance != uint(-1)) {
+        if (startingAllowance != none) {
             transferAllowances[src][spender] = allowanceNew;
         }
 
@@ -1122,7 +1125,7 @@ contract CToken is CTokenInterface, Exponential, TokenErrorReporter {
      * @param amount The number of tokens to transfer
      * @return Whether or not the transfer succeeded
      */
-    function transfer(address dst, uint256 amount) external nonReentrant returns (bool) {
+    function transfer(address dst, uint256 amount) external override nonReentrant returns (bool) {
         return transferTokens(msg.sender, msg.sender, dst, amount) == uint(Error.NO_ERROR);
     }
 
@@ -1133,7 +1136,7 @@ contract CToken is CTokenInterface, Exponential, TokenErrorReporter {
      * @param amount The number of tokens to transfer
      * @return Whether or not the transfer succeeded
      */
-    function transferFrom(address src, address dst, uint256 amount) external nonReentrant returns (bool) {
+    function transferFrom(address src, address dst, uint256 amount) external override nonReentrant returns (bool) {
         return transferTokens(msg.sender, src, dst, amount) == uint(Error.NO_ERROR);
     }
 
@@ -1145,7 +1148,7 @@ contract CToken is CTokenInterface, Exponential, TokenErrorReporter {
      * @param amount The number of tokens that are approved (-1 means infinite)
      * @return Whether or not the approval succeeded
      */
-    function approve(address spender, uint256 amount) external returns (bool) {
+    function approve(address spender, uint256 amount) external override returns (bool) {
         address src = msg.sender;
         transferAllowances[src][spender] = amount;
         emit Approval(src, spender, amount);
@@ -1158,7 +1161,7 @@ contract CToken is CTokenInterface, Exponential, TokenErrorReporter {
      * @param spender The address of the account which may transfer tokens
      * @return The number of tokens allowed to be spent (-1 means infinite)
      */
-    function allowance(address owner, address spender) external view returns (uint256) {
+    function allowance(address owner, address spender) external override view returns (uint256) {
         return transferAllowances[owner][spender];
     }
 
@@ -1167,7 +1170,7 @@ contract CToken is CTokenInterface, Exponential, TokenErrorReporter {
      * @param owner The address of the account to query
      * @return The number of tokens owned by `owner`
      */
-    function balanceOf(address owner) external view returns (uint256) {
+    function balanceOf(address owner) external override view returns (uint256) {
         return accountTokens[owner];
     }
 
@@ -1177,7 +1180,7 @@ contract CToken is CTokenInterface, Exponential, TokenErrorReporter {
      * @param account Address of the account to snapshot
      * @return (possible error, token balance, borrow balance, exchange rate mantissa)
      */
-    function getAccountSnapshot(address account) external view returns (uint, uint, uint, uint) {
+    function getAccountSnapshot(address account) external override view returns (uint, uint, uint, uint) {
         uint cTokenBalance = accountTokens[account];
         uint borrowBalance;
         uint exchangeRateMantissa;
@@ -1209,7 +1212,7 @@ contract CToken is CTokenInterface, Exponential, TokenErrorReporter {
      * @notice Returns the current per-block borrow interest rate for this cToken
      * @return The borrow interest rate per block, scaled by 1e18
      */
-    function borrowRatePerBlock() external view returns (uint) {
+    function borrowRatePerBlock() external override view returns (uint) {
         return interestRateModel.getBorrowRate(getCashPrior(), totalBorrows, totalReserves);
     }
 
@@ -1217,7 +1220,7 @@ contract CToken is CTokenInterface, Exponential, TokenErrorReporter {
      * @notice Returns the current per-block supply interest rate for this cToken
      * @return The supply interest rate per block, scaled by 1e18
      */
-    function supplyRatePerBlock() external view returns (uint) {
+    function supplyRatePerBlock() external override view returns (uint) {
         return interestRateModel.getSupplyRate(getCashPrior(), totalBorrows, totalReserves, reserveFactorMantissa);
     }
 
@@ -1225,7 +1228,7 @@ contract CToken is CTokenInterface, Exponential, TokenErrorReporter {
      * @notice Returns the current total borrows plus accrued interest
      * @return The total borrows with interest
      */
-    function totalBorrowsCurrent() external nonReentrant returns (uint) {
+    function totalBorrowsCurrent() external override nonReentrant returns (uint) {
         require(accrueInterest() == uint(Error.NO_ERROR), "accrue interest failed");
         return totalBorrows;
     }
@@ -1235,7 +1238,7 @@ contract CToken is CTokenInterface, Exponential, TokenErrorReporter {
      * @param account The address whose balance should be calculated after updating borrowIndex
      * @return The calculated balance
      */
-    function borrowBalanceCurrent(address account) external nonReentrant returns (uint) {
+    function borrowBalanceCurrent(address account) external override nonReentrant returns (uint) {
         require(accrueInterest() == uint(Error.NO_ERROR), "accrue interest failed");
         return borrowBalanceStored(account);
     }
@@ -1245,7 +1248,7 @@ contract CToken is CTokenInterface, Exponential, TokenErrorReporter {
      * @param account The address whose balance should be calculated
      * @return The calculated balance
      */
-    function borrowBalanceStored(address account) public view returns (uint) {
+    function borrowBalanceStored(address account) public override view returns (uint) {
         (MathError err, uint result) = borrowBalanceStoredInternal(account);
         require(err == MathError.NO_ERROR, "borrowBalanceStored: borrowBalanceStoredInternal failed");
         return result;
@@ -1293,7 +1296,7 @@ contract CToken is CTokenInterface, Exponential, TokenErrorReporter {
      * @dev This function does not accrue interest before calculating the exchange rate
      * @return Calculated exchange rate scaled by 1e18
      */
-    function exchangeRateStored() public view returns (uint) {
+    function exchangeRateStored() public override view returns (uint) {
         (MathError err, uint result) = exchangeRateStoredInternal();
         require(err == MathError.NO_ERROR, "exchangeRateStored: exchangeRateStoredInternal failed");
         return result;
@@ -1340,7 +1343,7 @@ contract CToken is CTokenInterface, Exponential, TokenErrorReporter {
      * @notice Get cash balance of this cToken in the underlying asset
      * @return The quantity of underlying asset owned by this contract
      */
-    function getCash() external view returns (uint) {
+    function getCash() external override view returns (uint) {
         return getCashPrior();
     }
 
@@ -1349,7 +1352,7 @@ contract CToken is CTokenInterface, Exponential, TokenErrorReporter {
      * @dev This calculates interest accrued from the last checkpointed block
      *   up to the current block and writes new checkpoint to storage.
      */
-    function accrueInterest() public returns (uint) {
+    function accrueInterest() public override returns (uint) {
         /* Remember the initial block number */
         uint currentBlockNumber = getBlockNumber();
         uint accrualBlockNumberPrior = accrualBlockNumber;
@@ -1541,7 +1544,7 @@ contract CToken is CTokenInterface, Exponential, TokenErrorReporter {
             return fail(Error(error), FailureInfo.REDEEM_ACCRUE_INTEREST_FAILED);
         }
         // redeemFresh emits redeem-specific logs on errors, so we don't need to
-        return redeemFresh(msg.sender, redeemTokens, 0);
+        return redeemFresh(payable(msg.sender), redeemTokens, 0); // TODO: unsafe conversion to address payable
     }
 
     /**
@@ -1557,7 +1560,7 @@ contract CToken is CTokenInterface, Exponential, TokenErrorReporter {
             return fail(Error(error), FailureInfo.REDEEM_ACCRUE_INTEREST_FAILED);
         }
         // redeemFresh emits redeem-specific logs on errors, so we don't need to
-        return redeemFresh(msg.sender, 0, redeemAmount);
+        return redeemFresh(payable(msg.sender), 0, redeemAmount); // TODO: unsafe conversion to address payable
     }
 
     struct RedeemLocalVars {
@@ -1686,7 +1689,7 @@ contract CToken is CTokenInterface, Exponential, TokenErrorReporter {
             return fail(Error(error), FailureInfo.BORROW_ACCRUE_INTEREST_FAILED);
         }
         // borrowFresh emits borrow-specific logs on errors, so we don't need to
-        return borrowFresh(msg.sender, borrowAmount);
+        return borrowFresh(payable(msg.sender), borrowAmount); // TODO: unsafe conversion to address payable
     }
 
     struct BorrowLocalVars {
@@ -1839,7 +1842,7 @@ contract CToken is CTokenInterface, Exponential, TokenErrorReporter {
         }
 
         /* If repayAmount == -1, repayAmount = accountBorrows */
-        if (repayAmount == uint(-1)) {
+        if (repayAmount == none) {
             vars.repayAmount = vars.accountBorrows;
         } else {
             vars.repayAmount = repayAmount;
@@ -1945,7 +1948,7 @@ contract CToken is CTokenInterface, Exponential, TokenErrorReporter {
         }
 
         /* Fail if repayAmount = -1 */
-        if (repayAmount == uint(-1)) {
+        if (repayAmount == none) {
             return (fail(Error.INVALID_CLOSE_AMOUNT_REQUESTED, FailureInfo.LIQUIDATE_CLOSE_AMOUNT_IS_UINT_MAX), 0);
         }
 
@@ -1996,7 +1999,7 @@ contract CToken is CTokenInterface, Exponential, TokenErrorReporter {
      * @param seizeTokens The number of cTokens to seize
      * @return uint 0=success, otherwise a failure (see ErrorReporter.sol for details)
      */
-    function seize(address liquidator, address borrower, uint seizeTokens) external nonReentrant returns (uint) {
+    function seize(address liquidator, address borrower, uint seizeTokens) external override nonReentrant returns (uint) {
         return seizeInternal(msg.sender, liquidator, borrower, seizeTokens);
     }
 
@@ -2093,7 +2096,7 @@ contract CToken is CTokenInterface, Exponential, TokenErrorReporter {
       * @param newPendingAdmin New pending admin.
       * @return uint 0=success, otherwise a failure (see ErrorReporter.sol for details)
       */
-    function _setPendingAdmin(address payable newPendingAdmin) external returns (uint) {
+    function _setPendingAdmin(address payable newPendingAdmin) external override returns (uint) {
         // Check caller = admin
         if (msg.sender != admin) {
             return fail(Error.UNAUTHORIZED, FailureInfo.SET_PENDING_ADMIN_OWNER_CHECK);
@@ -2116,7 +2119,7 @@ contract CToken is CTokenInterface, Exponential, TokenErrorReporter {
       * @dev Admin function for pending admin to accept role and update admin
       * @return uint 0=success, otherwise a failure (see ErrorReporter.sol for details)
       */
-    function _acceptAdmin() external returns (uint) {
+    function _acceptAdmin() external override returns (uint) {
         // Check caller is pendingAdmin and pendingAdmin ≠ address(0)
         if (msg.sender != pendingAdmin || msg.sender == address(0)) {
             return fail(Error.UNAUTHORIZED, FailureInfo.ACCEPT_ADMIN_PENDING_ADMIN_CHECK);
@@ -2130,7 +2133,7 @@ contract CToken is CTokenInterface, Exponential, TokenErrorReporter {
         admin = pendingAdmin;
 
         // Clear the pending value
-        pendingAdmin = address(0);
+        pendingAdmin = payable(0);
 
         emit NewAdmin(oldAdmin, admin);
         emit NewPendingAdmin(oldPendingAdmin, pendingAdmin);
@@ -2143,7 +2146,7 @@ contract CToken is CTokenInterface, Exponential, TokenErrorReporter {
       * @dev Admin function to set a new comptroller
       * @return uint 0=success, otherwise a failure (see ErrorReporter.sol for details)
       */
-    function _setComptroller(ComptrollerInterface newComptroller) public returns (uint) {
+    function _setComptroller(ComptrollerInterface newComptroller) public override returns (uint) {
         // Check caller is admin
         if (msg.sender != admin) {
             return fail(Error.UNAUTHORIZED, FailureInfo.SET_COMPTROLLER_OWNER_CHECK);
@@ -2167,7 +2170,7 @@ contract CToken is CTokenInterface, Exponential, TokenErrorReporter {
       * @dev Admin function to set a new protocol seize share
       * @return uint 0=success, otherwise revert
       */
-    function _setProtocolSeizeShare(uint newProtocolSeizeShareMantissa) external returns (uint) {
+    function _setProtocolSeizeShare(uint newProtocolSeizeShareMantissa) external override returns (uint) {
         // Check caller is admin
         require(msg.sender == admin, "Caller is not Admin");
         require(newProtocolSeizeShareMantissa <= 1e18, "Protocol seize share must be < 100%");
@@ -2186,7 +2189,7 @@ contract CToken is CTokenInterface, Exponential, TokenErrorReporter {
       * @dev Admin function to accrue interest and set a new reserve factor
       * @return uint 0=success, otherwise a failure (see ErrorReporter.sol for details)
       */
-    function _setReserveFactor(uint newReserveFactorMantissa) external nonReentrant returns (uint) {
+    function _setReserveFactor(uint newReserveFactorMantissa) external override nonReentrant returns (uint) {
         uint error = accrueInterest();
         if (error != uint(Error.NO_ERROR)) {
             // accrueInterest emits logs on errors, but on top of that we want to log the fact that an attempted reserve factor change failed.
@@ -2293,7 +2296,7 @@ contract CToken is CTokenInterface, Exponential, TokenErrorReporter {
      * @param reduceAmount Amount of reduction to reserves
      * @return uint 0=success, otherwise a failure (see ErrorReporter.sol for details)
      */
-    function _reduceReserves(uint reduceAmount) external nonReentrant returns (uint) {
+    function _reduceReserves(uint reduceAmount) external override nonReentrant returns (uint) {
         uint error = accrueInterest();
         if (error != uint(Error.NO_ERROR)) {
             // accrueInterest emits logs on errors, but on top of that we want to log the fact that an attempted reduce reserves failed.
@@ -2358,7 +2361,7 @@ contract CToken is CTokenInterface, Exponential, TokenErrorReporter {
      * @param newInterestRateModel the new interest rate model to use
      * @return uint 0=success, otherwise a failure (see ErrorReporter.sol for details)
      */
-    function _setInterestRateModel(InterestRateModel newInterestRateModel) public returns (uint) {
+    function _setInterestRateModel(InterestRateModel newInterestRateModel) public override returns (uint) {
         uint error = accrueInterest();
         if (error != uint(Error.NO_ERROR)) {
             // accrueInterest emits logs on errors, but on top of that we want to log the fact that an attempted change of interest rate model failed
@@ -2411,20 +2414,20 @@ contract CToken is CTokenInterface, Exponential, TokenErrorReporter {
      * @dev This excludes the value of the current message, if any
      * @return The quantity of underlying owned by this contract
      */
-    function getCashPrior() internal view returns (uint);
+    function getCashPrior() internal virtual view returns (uint);
 
     /**
      * @dev Performs a transfer in, reverting upon failure. Returns the amount actually transferred to the protocol, in case of a fee.
      *  This may revert due to insufficient balance or insufficient allowance.
      */
-    function doTransferIn(address from, uint amount) internal returns (uint);
+    function doTransferIn(address from, uint amount) internal virtual returns (uint);
 
     /**
      * @dev Performs a transfer out, ideally returning an explanatory error code upon failure tather than reverting.
      *  If caller has not called checked protocol's balance, may revert due to insufficient cash held in the contract.
      *  If caller has checked protocol's balance, and verified it is >= amount, this should not revert in normal conditions.
      */
-    function doTransferOut(address payable to, uint amount) internal;
+    function doTransferOut(address payable to, uint amount) internal virtual;
 
 
     /*** Reentrancy Guard ***/

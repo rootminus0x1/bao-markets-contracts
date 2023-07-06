@@ -10,3 +10,6 @@ deployedContracts.txt
 #Hardhat files
 cache
 artifacts
+
+#emacs files
+*.~undo-tree~

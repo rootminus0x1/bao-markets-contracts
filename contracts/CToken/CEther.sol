@@ -1,7 +1,8 @@
+// SPDX-License-Identifier: Unlicense
 import "./CToken.sol";
 
 // File: CEther.sol
-pragma solidity ^0.5.16;
+pragma solidity ^0.8.1;
 
 
 /**
@@ -10,6 +11,8 @@ pragma solidity ^0.5.16;
  * @author Compound
  */
 contract CEther is CToken {
+    using FixedPointMathLib for uint256;
+
     /**
      * @notice Construct a new CEther money market
      * @param comptroller_ The address of the Comptroller
@@ -24,14 +27,14 @@ contract CEther is CToken {
                 uint initialExchangeRateMantissa_,
                 string memory name_,
                 string memory symbol_,
-                uint8 decimals_) public {
+                uint8 decimals_) {
         // Creator of the contract is admin during initialization
-        admin = msg.sender;
+        admin = payable(msg.sender);
 
         initialize(comptroller_, interestRateModel_, initialExchangeRateMantissa_, name_, symbol_, decimals_);
 
         // Set the proper admin now that initialization is done
-        admin = tx.origin;
+        admin = payable(tx.origin);
     }
 
 
@@ -115,7 +118,7 @@ contract CEther is CToken {
     /**
      * @notice Send Ether to CEther to mint
      */
-    function () external payable {
+    fallback() external {
         (uint err,) = mintInternal(msg.value);
         requireNoError(err, "mint failed");
     }
@@ -127,7 +130,7 @@ contract CEther is CToken {
      * @dev This excludes the value of the current message, if any
      * @return The quantity of Ether owned by this contract
      */
-    function getCashPrior() internal view returns (uint) {
+    function getCashPrior() internal override view returns (uint) {
         (MathError err, uint startingBalance) = subUInt(address(this).balance, msg.value);
         require(err == MathError.NO_ERROR);
         return startingBalance;
@@ -139,14 +142,14 @@ contract CEther is CToken {
      * @param amount Amount of Ether being sent
      * @return The actual amount of Ether transferred
      */
-    function doTransferIn(address from, uint amount) internal returns (uint) {
+    function doTransferIn(address from, uint amount) internal override returns (uint) {
         // Sanity checks
         require(msg.sender == from, "sender mismatch");
         require(msg.value == amount, "value mismatch");
         return amount;
     }
 
-    function doTransferOut(address payable to, uint amount) internal {
+    function doTransferOut(address payable to, uint amount) internal override {
         /* Send the Ether, with minimal gas and revert on failure */
         to.transfer(amount);
     }
@@ -163,17 +166,17 @@ contract CEther is CToken {
             fullMessage[i] = bytes(message)[i];
         }
 
-        fullMessage[i+0] = byte(uint8(32));
-        fullMessage[i+1] = byte(uint8(40));
-        fullMessage[i+2] = byte(uint8(48 + ( errCode / 10 )));
-        fullMessage[i+3] = byte(uint8(48 + ( errCode % 10 )));
-        fullMessage[i+4] = byte(uint8(41));
+        fullMessage[i+0] = bytes1(uint8(32));
+        fullMessage[i+1] = bytes1(uint8(40));
+        fullMessage[i+2] = bytes1(uint8(48 + ( errCode / 10 )));
+        fullMessage[i+3] = bytes1(uint8(48 + ( errCode % 10 )));
+        fullMessage[i+4] = bytes1(uint8(41));
 
         require(errCode == uint(Error.NO_ERROR), string(fullMessage));
     }
 
     /**
-     * @author Modified from transmissions11 (https://github.com/transmissions11/libcompound/blob/main/src/LibCompound.sol)
+     * @dev Modified from transmissions11 (https://github.com/transmissions11/libcompound/blob/main/src/LibCompound.sol)
      * @return Calculated exchange rate scaled by 1e18
      */
     function exchangeRateCurrent() public view returns (uint) {
@@ -207,7 +210,7 @@ contract CEther is CToken {
 
     /**
      * @notice Get the underlying balance of the `owner`
-     * @author Modified from transmissions11 (https://github.com/transmissions11/libcompound/blob/main/src/LibCompound.sol)
+     * @dev Modified from transmissions11 (https://github.com/transmissions11/libcompound/blob/main/src/LibCompound.sol)
      * @param owner The address of the account to query
      * @return The amount of underlying owned by `owner`
      */

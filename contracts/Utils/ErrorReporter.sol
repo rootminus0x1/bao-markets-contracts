@@ -1,5 +1,6 @@
-pragma solidity ^0.5.16;
+pragma solidity ^0.8.1;
 
+// SPDX-License-Identifier: UNLICENSED
 
 contract ComptrollerErrorReporter {
     enum Error {
